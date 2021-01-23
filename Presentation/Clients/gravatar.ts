@@ -4,13 +4,16 @@ import {
   DynamoDBClient,
   GetItemCommand,
   PutItemCommand,
+  DeleteItemCommand,
 } from "@aws-sdk/client-dynamodb";
 import { KMSService } from "../../Services/kms.service";
 
 export class AvbxGravatarClient {
   private _region: string = "us-east-1";
 
-  private _kmsService: KMSService = new KMSService(process.env.KMS_KEY_ID as string);
+  private _kmsService: KMSService = new KMSService(
+    process.env.KMS_KEY_ID as string
+  );
 
   public async login(
     email: string,
@@ -43,6 +46,21 @@ export class AvbxGravatarClient {
       return null;
     }
     return client;
+  }
+
+  public async delete(email: string): Promise<void> {
+    const client = new DynamoDBClient({ region: this._region });
+    const command = new DeleteItemCommand({
+      TableName: "Gravatars",
+      Key: {
+        email: {
+          S: email,
+        },
+      },
+    });
+    const result = await client.send(command);
+
+    console.info(result);
   }
 
   private async _putUser(user: GravatarUser): Promise<void> {
@@ -84,5 +102,4 @@ export class AvbxGravatarClient {
     }
     return null;
   }
-
 }
