@@ -1,11 +1,10 @@
 import { KMSClient, EncryptCommand, DecryptCommand } from "@aws-sdk/client-kms";
 
 export class KMSService {
-
   private _region: string = "us-east-1";
   private _keyId: string;
 
-  constructor(keyId: string){
+  constructor(keyId: string) {
     this._keyId = keyId;
   }
 
