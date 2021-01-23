@@ -22,7 +22,12 @@ export class AvbxGravatarClient {
       await client.test();
       const user = { email } as GravatarUser;
       user.password = await this.kms.encrypt(password);
-      await this.dynamo.putUser(user);
+      const exists = await this.dynamo.findUser(user.email);
+      if (exists) {
+        await this.dynamo.updateUserPassword(user);
+      } else {
+        await this.dynamo.putUser(user);
+      }
     } catch (error) {
       console.error(error);
       return null;
@@ -45,8 +50,13 @@ export class AvbxGravatarClient {
     return client;
   }
 
+  public async on(email: string): Promise<void> {
+    await this.dynamo.activateUser(email);
+  }
+  public async off(email: string): Promise<void> {
+    await this.dynamo.deactivateUser(email);
+  }
   public async delete(email: string): Promise<void> {
-    const result = await this.dynamo.deleteUser(email);
-    console.info(result);
+    await this.dynamo.deleteUser(email);
   }
 }

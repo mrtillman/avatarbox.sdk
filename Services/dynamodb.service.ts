@@ -1,6 +1,7 @@
 import {
   DynamoDBClient,
   GetItemCommand,
+  UpdateItemCommand,
   PutItemCommand,
   DeleteItemCommand,
   ServiceOutputTypes,
@@ -24,6 +25,11 @@ export namespace DynamoDBService {
       return await this.client.send(command);
     }
     protected async put(command: PutItemCommand): Promise<ServiceOutputTypes> {
+      return await this.client.send(command);
+    }
+    protected async update(
+      command: UpdateItemCommand
+    ): Promise<ServiceOutputTypes> {
       return await this.client.send(command);
     }
     protected async delete(
@@ -70,9 +76,34 @@ export namespace DynamoDBService {
           password: {
             S: user.password,
           },
+          is_active: {
+            BOOL: false,
+          },
         },
       });
       const result = await this.put(command);
+      console.info(result);
+    }
+
+    public async updateUserPassword(user: GravatarUser): Promise<void> {
+      const command = new UpdateItemCommand({
+        TableName: this._tableName,
+        Key: {
+          email: {
+            S: user.email,
+          },
+        },
+        ExpressionAttributeNames: {
+          "#P": "password",
+        },
+        ExpressionAttributeValues: {
+          ":p": {
+            S: user.password,
+          },
+        },
+        UpdateExpression: "SET #P = :p",
+      });
+      const result = await this.update(command);
       console.info(result);
     }
 
@@ -87,6 +118,40 @@ export namespace DynamoDBService {
       });
       const result = await this.delete(command);
       console.info(result);
+    }
+
+    public async activateUser(email: string): Promise<void> {
+      const result = await this._toggleUser(email, true);
+      console.info(result);
+    }
+
+    public async deactivateUser(email: string): Promise<void> {
+      const result = await this._toggleUser(email, false);
+      console.info(result);
+    }
+
+    private async _toggleUser(
+      email: string,
+      is_active: boolean
+    ): Promise<ServiceOutputTypes> {
+      const command = new UpdateItemCommand({
+        TableName: this._tableName,
+        Key: {
+          email: {
+            S: email,
+          },
+        },
+        ExpressionAttributeNames: {
+          "#A": "is_active",
+        },
+        ExpressionAttributeValues: {
+          ":a": {
+            BOOL: is_active,
+          },
+        },
+        UpdateExpression: "SET #A = :a",
+      });
+      return await this.update(command);
     }
   }
 }
