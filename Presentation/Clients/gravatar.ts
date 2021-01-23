@@ -1,19 +1,16 @@
 import { GravatarClient } from "grav.client";
-import { GravatarUser } from "../../Domain/GravatarUser";
-import {
-  DynamoDBClient,
-  GetItemCommand,
-  PutItemCommand,
-  DeleteItemCommand,
-} from "@aws-sdk/client-dynamodb";
+import { GravatarUser } from "../../Domain/gravatar-user";
 import { KMSService } from "../../Services/kms.service";
+import { DynamoDBService } from "../../Services/dynamodb.service";
 
 export class AvbxGravatarClient {
-  private _region: string = "us-east-1";
+  public kms: KMSService;
+  public dynamo: DynamoDBService.Gravatar;
 
-  private _kmsService: KMSService = new KMSService(
-    process.env.KMS_KEY_ID as string
-  );
+  constructor() {
+    this.kms = new KMSService(process.env.KMS_KEY_ID as string);
+    this.dynamo = new DynamoDBService.Gravatar();
+  }
 
   public async login(
     email: string,
@@ -24,8 +21,8 @@ export class AvbxGravatarClient {
     try {
       await client.test();
       const user = { email } as GravatarUser;
-      user.password = await this._kmsService.encrypt(password);
-      await this._putUser(user);
+      user.password = await this.kms.encrypt(password);
+      await this.dynamo.putUser(user);
     } catch (error) {
       console.error(error);
       return null;
@@ -35,9 +32,9 @@ export class AvbxGravatarClient {
   }
 
   public async fetch(email: string): Promise<GravatarClient | null> {
-    const user = await this._findUser(email);
+    const user = await this.dynamo.findUser(email);
     if (!user) return null;
-    const password = await this._kmsService.decrypt(user.password);
+    const password = await this.kms.decrypt(user.password);
     const client = new GravatarClient(user.email, password);
     try {
       await client.test();
@@ -49,57 +46,7 @@ export class AvbxGravatarClient {
   }
 
   public async delete(email: string): Promise<void> {
-    const client = new DynamoDBClient({ region: this._region });
-    const command = new DeleteItemCommand({
-      TableName: "Gravatars",
-      Key: {
-        email: {
-          S: email,
-        },
-      },
-    });
-    const result = await client.send(command);
-
+    const result = await this.dynamo.deleteUser(email);
     console.info(result);
-  }
-
-  private async _putUser(user: GravatarUser): Promise<void> {
-    const client = new DynamoDBClient({ region: this._region });
-
-    const command = new PutItemCommand({
-      TableName: "Gravatars",
-      Item: {
-        email: {
-          S: user.email,
-        },
-        password: {
-          S: user.password,
-        },
-      },
-    });
-
-    const result = await client.send(command);
-
-    console.info(result);
-  }
-
-  private async _findUser(email: string): Promise<GravatarUser | null> {
-    const client = new DynamoDBClient({ region: this._region });
-    const command = new GetItemCommand({
-      TableName: "Gravatars",
-      Key: {
-        email: {
-          S: email,
-        },
-      },
-    });
-    const result = await client.send(command);
-    if (result.Item) {
-      return {
-        email: result.Item.email.S,
-        password: result.Item.password.S,
-      } as GravatarUser;
-    }
-    return null;
   }
 }
