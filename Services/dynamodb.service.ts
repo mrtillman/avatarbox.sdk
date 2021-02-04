@@ -8,6 +8,7 @@ import {
   GetItemCommandOutput,
 } from "@aws-sdk/client-dynamodb";
 import { GravatarUser } from "../Domain/gravatar-user";
+import moment from "moment";
 
 export namespace DynamoDBService {
   class DynamoDBServiceBase {
@@ -67,6 +68,7 @@ export namespace DynamoDBService {
     }
 
     public async putUser(user: GravatarUser): Promise<void> {
+      const yesterday = moment().subtract(1, "days");
       const command = new PutItemCommand({
         TableName: this._tableName,
         Item: {
@@ -75,6 +77,9 @@ export namespace DynamoDBService {
           },
           password: {
             S: user.password,
+          },
+          last_updated: {
+            S: yesterday.toISOString(),
           },
           is_active: {
             BOOL: false,
