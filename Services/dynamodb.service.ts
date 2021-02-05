@@ -8,12 +8,19 @@ import {
   ScanCommand,
   GetItemCommandOutput,
   ScanCommandOutput,
+  BatchWriteItemCommand,
+  BatchWriteItemCommandOutput,
+  AttributeValue,
 } from "@aws-sdk/client-dynamodb";
 import { GravatarUser } from "../Domain/gravatar-user";
-import { yesterday } from "../Common/date.helper";
+import { yesterday, daysAgo } from "../Common/date.helper";
 
 const _yesterday = function (): string {
   return yesterday().getTime().toString();
+};
+
+const _daysAgo = function (days: number): string {
+  return daysAgo(days).getTime().toString();
 };
 
 export namespace DynamoDBService {
@@ -45,6 +52,11 @@ export namespace DynamoDBService {
       return await this.client.send(command);
     }
     protected async scan(command: ScanCommand): Promise<ScanCommandOutput> {
+      return await this.client.send(command);
+    }
+    protected async batchWrite(
+      command: BatchWriteItemCommand
+    ): Promise<BatchWriteItemCommandOutput> {
       return await this.client.send(command);
     }
   }
@@ -131,6 +143,39 @@ export namespace DynamoDBService {
       });
       const result = await this.delete(command);
       console.info(result);
+    }
+
+    public async purge(days: number): Promise<void> {
+      const scanCommand = new ScanCommand({
+        TableName: this._tableName,
+        ScanFilter: {
+          last_updated: {
+            AttributeValueList: [{ N: _daysAgo(days) }],
+            ComparisonOperator: "LE",
+          },
+        },
+      });
+      const scanResult = await this.scan(scanCommand);
+      const keys: AttributeValue[] = [];
+      if (scanResult.Items && scanResult.Items.length) {
+        scanResult.Items.forEach((item) => {
+          keys.push(item.email);
+        });
+      }
+      if (keys.length) {
+        const batchWriteInput = {
+          RequestItems: {
+            [this._tableName]: keys.map((key) => ({
+              DeleteRequest: {
+                Key: { email: key },
+              },
+            })),
+          },
+        };
+        const batchCommand = new BatchWriteItemCommand(batchWriteInput);
+        const result = await this.batchWrite(batchCommand);
+        console.info(result);
+      }
     }
 
     public async collect(): Promise<(string | undefined)[] | null> {
