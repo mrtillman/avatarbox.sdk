@@ -59,4 +59,7 @@ export class AvbxGravatarClient {
   public async delete(email: string): Promise<void> {
     await this.dynamo.deleteUser(email);
   }
+  public async collect(): Promise<(string | undefined)[] | null> {
+    return await this.dynamo.collect();
+  }
 }

@@ -5,10 +5,16 @@ import {
   PutItemCommand,
   DeleteItemCommand,
   ServiceOutputTypes,
+  ScanCommand,
   GetItemCommandOutput,
+  ScanCommandOutput,
 } from "@aws-sdk/client-dynamodb";
 import { GravatarUser } from "../Domain/gravatar-user";
-import moment from "moment";
+import { yesterday } from "../Common/date.helper";
+
+const _yesterday = function (): string {
+  return yesterday().getTime().toString();
+};
 
 export namespace DynamoDBService {
   class DynamoDBServiceBase {
@@ -36,6 +42,9 @@ export namespace DynamoDBService {
     protected async delete(
       command: DeleteItemCommand
     ): Promise<ServiceOutputTypes> {
+      return await this.client.send(command);
+    }
+    protected async scan(command: ScanCommand): Promise<ScanCommandOutput> {
       return await this.client.send(command);
     }
   }
@@ -68,7 +77,6 @@ export namespace DynamoDBService {
     }
 
     public async putUser(user: GravatarUser): Promise<void> {
-      const yesterday = moment().subtract(1, "days");
       const command = new PutItemCommand({
         TableName: this._tableName,
         Item: {
@@ -79,7 +87,7 @@ export namespace DynamoDBService {
             S: user.password,
           },
           last_updated: {
-            S: yesterday.toISOString(),
+            N: _yesterday(),
           },
           is_active: {
             BOOL: false,
@@ -123,6 +131,27 @@ export namespace DynamoDBService {
       });
       const result = await this.delete(command);
       console.info(result);
+    }
+
+    public async collect(): Promise<(string | undefined)[] | null> {
+      const command = new ScanCommand({
+        TableName: this._tableName,
+        ScanFilter: {
+          last_updated: {
+            AttributeValueList: [{ N: _yesterday() }],
+            ComparisonOperator: "LE",
+          },
+          is_active: {
+            AttributeValueList: [{ BOOL: true }],
+            ComparisonOperator: "EQ",
+          },
+        },
+      });
+      const result = await this.scan(command);
+      if (result.Items && result.Items.length) {
+        return result.Items.map((item) => item.email.S);
+      }
+      return null;
     }
 
     public async activateUser(email: string): Promise<void> {
