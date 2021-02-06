@@ -2,14 +2,17 @@ import { GravatarClient } from "grav.client";
 import { GravatarUser } from "../../Domain/gravatar-user";
 import { KMSService } from "../../Services/kms.service";
 import { DynamoDBService } from "../../Services/dynamodb.service";
+import { SQSService } from "../../Services/sqs.service";
 
 export class AvbxGravatarClient {
   public kms: KMSService;
   public dynamo: DynamoDBService.Gravatar;
+  public sqs: SQSService;
 
   constructor() {
     this.kms = new KMSService(process.env.KMS_KEY_ID as string);
     this.dynamo = new DynamoDBService.Gravatar();
+    this.sqs = new SQSService();
   }
 
   public async login(
@@ -69,7 +72,7 @@ export class AvbxGravatarClient {
     return await this.dynamo.purge(days);
   }
   public async touch(email: string): Promise<void> {
-    // TODO: send SQS message to worker service
+    await this.sqs.touch(email);
   }
   public async updateImageHash(
     email: string,
