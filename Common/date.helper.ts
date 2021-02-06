@@ -7,3 +7,7 @@ export function yesterday(): Date {
 export function daysAgo(days: number): Date {
   return moment().subtract(days, "days").toDate();
 }
+
+export function today(): Date {
+  return moment().toDate();
+}

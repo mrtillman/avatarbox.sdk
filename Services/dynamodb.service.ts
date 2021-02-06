@@ -13,7 +13,7 @@ import {
   AttributeValue,
 } from "@aws-sdk/client-dynamodb";
 import { GravatarUser } from "../Domain/gravatar-user";
-import { yesterday, daysAgo } from "../Common/date.helper";
+import { today, yesterday, daysAgo } from "../Common/date.helper";
 
 const _yesterday = function (): string {
   return yesterday().getTime().toString();
@@ -21,6 +21,10 @@ const _yesterday = function (): string {
 
 const _daysAgo = function (days: number): string {
   return daysAgo(days).getTime().toString();
+};
+
+const _today = function (): string {
+  return today().getTime().toString();
 };
 
 export namespace DynamoDBService {
@@ -209,6 +213,35 @@ export namespace DynamoDBService {
 
     public async deactivateUser(email: string): Promise<void> {
       const result = await this._toggleUser(email, false);
+      console.info(result);
+    }
+
+    public async updateImageHash(
+      email: string,
+      image_hash: string
+    ): Promise<void> {
+      const command = new UpdateItemCommand({
+        TableName: this._tableName,
+        Key: {
+          email: {
+            S: email,
+          },
+        },
+        ExpressionAttributeNames: {
+          "#I": "image_hash",
+          "#L": "last_updated",
+        },
+        ExpressionAttributeValues: {
+          ":i": {
+            S: image_hash,
+          },
+          ":l": {
+            N: _today(),
+          },
+        },
+        UpdateExpression: "SET #I = :i, #L = :l",
+      });
+      const result = await this.update(command);
       console.info(result);
     }
 

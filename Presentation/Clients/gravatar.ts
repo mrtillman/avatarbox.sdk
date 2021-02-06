@@ -68,4 +68,13 @@ export class AvbxGravatarClient {
   public async purge(days: number = 10): Promise<void> {
     return await this.dynamo.purge(days);
   }
+  public async touch(email: string): Promise<void> {
+    // TODO: send SQS message to worker service
+  }
+  public async updateImageHash(
+    email: string,
+    image_hash: string
+  ): Promise<void> {
+    await this.dynamo.updateImageHash(email, image_hash);
+  }
 }
