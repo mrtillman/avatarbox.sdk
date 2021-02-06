@@ -3,14 +3,12 @@ import { KMSClient, EncryptCommand, DecryptCommand } from "@aws-sdk/client-kms";
 export class KMSService {
   public kmsClient: KMSClient;
 
-  private _region: string;
   private _keyId: string;
 
   constructor(keyId: string) {
     this._keyId = keyId;
-    this._region = "us-east-1";
     this.kmsClient = new KMSClient({
-      region: this._region,
+      region: process.env.REGION,
     });
   }
 
