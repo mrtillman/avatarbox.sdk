@@ -68,7 +68,7 @@ const client = new AvbxGravatarClient();
 |`delete(emails)`|removes one or more Gravatar users from storage|
 |`collect()`|returns a list of email addresses for all Gravatar icons not updated in the past 24 hours|
 |`purge(days)`|removes all Gravatar users not updated in the past "x" number of days|
-|`touch(email)`|sends an SQS message to the Lambda worker service that updates Gravatar icons|
+|`touch(email)`|sends an SQS message to the Lambda worker that auto updates Gravatar icons|
 |`renew(email)`|alters the timestamp indicating when the Gravatar icon was last updated|
 
 ## License
