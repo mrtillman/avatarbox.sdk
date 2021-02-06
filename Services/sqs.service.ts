@@ -8,13 +8,12 @@ export class SQSService {
     });
   }
 
-  async touch(email: string): Promise<void>{
+  async touch(email: string): Promise<void> {
     const command = new SendMessageCommand({
       MessageBody: email,
-      QueueUrl: process.env.QUEUE_URL
+      QueueUrl: process.env.QUEUE_URL,
     });
     const result = await this.client.send(command);
     console.log(result);
   }
-
 }
