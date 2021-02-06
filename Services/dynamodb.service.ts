@@ -215,10 +215,7 @@ export namespace DynamoDBService {
       console.info(result);
     }
 
-    public async updateImageHash(
-      email: string,
-      image_hash: string
-    ): Promise<void> {
+    public async renew(email: string, image_hash: string): Promise<void> {
       const command = new UpdateItemCommand({
         TableName: this._tableName,
         Key: {
@@ -226,19 +223,29 @@ export namespace DynamoDBService {
             S: email,
           },
         },
-        ExpressionAttributeNames: {
-          "#I": "image_hash",
-          "#L": "last_updated",
-        },
-        ExpressionAttributeValues: {
-          ":i": {
-            S: image_hash,
-          },
-          ":l": {
-            N: _today(),
-          },
-        },
-        UpdateExpression: "SET #I = :i, #L = :l",
+        ExpressionAttributeNames: image_hash
+          ? {
+              "#I": "image_hash",
+              "#L": "last_updated",
+            }
+          : {
+              "#L": "last_updated",
+            },
+        ExpressionAttributeValues: image_hash
+          ? {
+              ":i": {
+                S: image_hash,
+              },
+              ":l": {
+                N: _today(),
+              },
+            }
+          : {
+              ":l": {
+                N: _today(),
+              },
+            },
+        UpdateExpression: "SET #L = :l" + (image_hash ? ", #I = :i" : ""),
       });
       const result = await this.update(command);
       console.info(result);

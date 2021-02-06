@@ -74,10 +74,7 @@ export class AvbxGravatarClient {
   public async touch(email: string): Promise<void> {
     await this.sqs.touch(email);
   }
-  public async updateImageHash(
-    email: string,
-    image_hash: string
-  ): Promise<void> {
-    await this.dynamo.updateImageHash(email, image_hash);
+  public async renew(email: string, image_hash: string = ""): Promise<void> {
+    await this.dynamo.renew(email, image_hash);
   }
 }
