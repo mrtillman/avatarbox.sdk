@@ -10,7 +10,6 @@ import {
   ScanCommandOutput,
   BatchWriteItemCommand,
   BatchWriteItemCommandOutput,
-  AttributeValue,
 } from "@aws-sdk/client-dynamodb";
 import { GravatarUser } from "../Domain/gravatar-user";
 import { today, yesterday, daysAgo } from "../Common/date.helper";
