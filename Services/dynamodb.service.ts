@@ -145,6 +145,22 @@ export namespace DynamoDBService {
       console.info(result);
     }
 
+    public async deleteUsers(emails: string[]): Promise<void> {
+      if (!emails.length) return;
+      const batchWriteInput = {
+        RequestItems: {
+          [this._tableName]: emails.map((email) => ({
+            DeleteRequest: {
+              Key: { email: { S: email } },
+            },
+          })),
+        },
+      };
+      const batchCommand = new BatchWriteItemCommand(batchWriteInput);
+      const result = await this.batchWrite(batchCommand);
+      console.info(result);
+    }
+
     public async purge(days: number): Promise<void> {
       const scanCommand = new ScanCommand({
         TableName: this._tableName,
@@ -156,26 +172,13 @@ export namespace DynamoDBService {
         },
       });
       const scanResult = await this.scan(scanCommand);
-      const keys: AttributeValue[] = [];
+      const emails: string[] = [];
       if (scanResult.Items && scanResult.Items.length) {
         scanResult.Items.forEach((item) => {
-          keys.push(item.email);
+          emails.push(item.email.S as string);
         });
       }
-      if (keys.length) {
-        const batchWriteInput = {
-          RequestItems: {
-            [this._tableName]: keys.map((key) => ({
-              DeleteRequest: {
-                Key: { email: key },
-              },
-            })),
-          },
-        };
-        const batchCommand = new BatchWriteItemCommand(batchWriteInput);
-        const result = await this.batchWrite(batchCommand);
-        console.info(result);
-      }
+      await this.deleteUsers(emails);
     }
 
     public async collect(): Promise<(string | undefined)[] | null> {
