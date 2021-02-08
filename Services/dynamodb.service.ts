@@ -12,28 +12,18 @@ import {
   BatchWriteItemCommandOutput,
 } from "@aws-sdk/client-dynamodb";
 import { GravatarUser } from "../Domain/gravatar-user";
-import { today, yesterday, daysAgo } from "../Common/date.helper";
-
-const _yesterday = function (): string {
-  return yesterday().getTime().toString();
-};
-
-const _daysAgo = function (days: number): string {
-  return daysAgo(days).getTime().toString();
-};
-
-const _today = function (): string {
-  return today().getTime().toString();
-};
+import { DynamoDbCalendar } from "../Common/calendar";
 
 export namespace DynamoDBService {
   class DynamoDBServiceBase {
+    public calendar: DynamoDbCalendar;
     public client: DynamoDBClient;
 
     private _region: string;
 
     constructor() {
       this._region = "us-east-1";
+      this.calendar = new DynamoDbCalendar();
       this.client = new DynamoDBClient({
         region: this._region,
       });
@@ -102,7 +92,7 @@ export namespace DynamoDBService {
             S: user.password,
           },
           last_updated: {
-            N: _yesterday(),
+            N: this.calendar.yesterday(),
           },
           is_active: {
             BOOL: false,
@@ -169,7 +159,7 @@ export namespace DynamoDBService {
         TableName: this._tableName,
         ScanFilter: {
           last_updated: {
-            AttributeValueList: [{ N: _daysAgo(days) }],
+            AttributeValueList: [{ N: this.calendar.daysAgo(days) }],
             ComparisonOperator: "LE",
           },
         },
@@ -189,7 +179,7 @@ export namespace DynamoDBService {
         TableName: this._tableName,
         ScanFilter: {
           last_updated: {
-            AttributeValueList: [{ N: _yesterday() }],
+            AttributeValueList: [{ N: this.calendar.yesterday() }],
             ComparisonOperator: "LE",
           },
           is_active: {
@@ -216,6 +206,7 @@ export namespace DynamoDBService {
     }
 
     public async renew(email: string, image_hash: string): Promise<void> {
+      const today = this.calendar.today();
       const command = new UpdateItemCommand({
         TableName: this._tableName,
         Key: {
@@ -237,12 +228,12 @@ export namespace DynamoDBService {
                 S: image_hash,
               },
               ":l": {
-                N: _today(),
+                N: today,
               },
             }
           : {
               ":l": {
-                N: _today(),
+                N: today,
               },
             },
         UpdateExpression: "SET #L = :l" + (image_hash ? ", #I = :i" : ""),
