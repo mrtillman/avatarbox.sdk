@@ -73,6 +73,4 @@ const client = new AvbxGravatarClient();
 
 ## License
 
----
-
 [MIT](https://github.com/mrtillman/avatarbox.sdk/blob/master/LICENSE)
