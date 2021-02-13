@@ -3,6 +3,7 @@ import { GravatarUser } from "../../Domain/gravatar-user";
 import { KMSService } from "../../Services/kms.service";
 import { DynamoDBService } from "../../Services/dynamodb.service";
 import { SQSService } from "../../Services/sqs.service";
+import { GravatarIcon } from "../../Domain/gravatar-icon";
 
 export class AvbxGravatarClient {
   public kms: KMSService;
@@ -23,7 +24,10 @@ export class AvbxGravatarClient {
 
     try {
       await client.test();
-      const user = { email } as GravatarUser;
+      const user = {
+        email,
+        emailHash: client.emailHash,
+      } as GravatarUser;
       user.password = await this.kms.encrypt(password);
       const exists = await this.dynamo.findUser(user.email);
       if (exists) {
@@ -65,7 +69,7 @@ export class AvbxGravatarClient {
     }
     return await this.dynamo.deleteUsers(emails);
   }
-  public async collect(): Promise<(string | undefined)[] | null> {
+  public async collect(): Promise<(GravatarIcon | undefined)[] | null> {
     return await this.dynamo.collect();
   }
   public async purge(days: number = 10): Promise<void> {

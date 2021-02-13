@@ -13,6 +13,7 @@ import {
 } from "@aws-sdk/client-dynamodb";
 import { GravatarUser } from "../Domain/gravatar-user";
 import { DynamoDbCalendar } from "../Common/calendar";
+import { GravatarIcon } from "../Domain/gravatar-icon";
 
 export namespace DynamoDBService {
   class DynamoDBServiceBase {
@@ -87,6 +88,9 @@ export namespace DynamoDBService {
         Item: {
           email: {
             S: user.email,
+          },
+          email_hash: {
+            S: user.emailHash,
           },
           password: {
             S: user.password,
@@ -174,7 +178,7 @@ export namespace DynamoDBService {
       await this.deleteUsers(emails);
     }
 
-    public async collect(): Promise<(string | undefined)[] | null> {
+    public async collect(): Promise<(GravatarIcon | undefined)[] | null> {
       const command = new ScanCommand({
         TableName: this._tableName,
         ScanFilter: {
@@ -190,7 +194,14 @@ export namespace DynamoDBService {
       });
       const result = await this.scan(command);
       if (result.Items && result.Items.length) {
-        return result.Items.map((item) => item.email.S);
+        return result.Items.map(
+          (item) =>
+            ({
+              email: item.email.S as string,
+              imageUrl: `https://www.gravatar.com/avatar/${item.email_hash.S}`,
+              lastUpdated: new Date(parseInt(item.last_updated.N as string)),
+            } as GravatarIcon)
+        );
       }
       return null;
     }
