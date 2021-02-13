@@ -1,6 +1,6 @@
 # avatarbox.sdk
 
- A NodeJS SDK for [avatarbox.io](https://avatarbox.io)
+ nodejs sdk for [avatarbox.io](https://avatarbox.io)
  
  ---
 
@@ -13,11 +13,26 @@
 [![NPM](https://nodei.co/npm/grav.client.png)](https://www.npmjs.com/package/grav.client)
 -->
 
+## Description
+
+**avatarbox.sdk** was designed to facilitate the development of application components such as [avatarbox.publisher](https://github.com/mrtillman/avatarbox.publisher) and [avatarbox.worker](https://github.com/mrtillman/avatarbox.worker), however it also supports [avatarbox.app](https://github.com/mrtillman/avatarbox.app) and [avatarbox.api](https://github.com/mrtillman/avatarbox.api).
+
 ## Checklist
 
+- DynamoDB table called `Gravatars` with `email` as key
 - KMS Symmetric Key
 - SQS Queue
-- DynamoDB table called `Gravatars` with `email` as sort key
+
+*SQS Queue Setup:*
+
+|Setting|Description|
+|---|---|
+|Delivery Delay|3 Seconds <sup>a.</sup>|
+|Lambda Triggers|`avbx-worker` <sup>b.</sup>|
+|Name|`avbx-worker-queue`|
+|Type|Standard|
+
+> a. Postpone delivery of new messages to avoid [cold start issues](https://github.com/mrtillman/avatarbox.worker/wiki/Resolving-Cold-Start-Issues). <br/>b. Use [avatarbox.worker](https://github.com/mrtillman/avatarbox.worker) to define this Lambda function.
 
 ## Installation
 
@@ -61,15 +76,15 @@ const client = new AvbxGravatarClient();
 
 |Method|Description|
 |---|---|
-|`login(email, password)`|authenticates a Gravatar user, stores that user, and then returns an instance of [GravatarClient](https://github.com/mrtillman/grav.client)|
-|`fetch(email)`|pulls a Gravatar user from storage, and then returns an instance of *GravatarClient*|
+|`login(email, password)`|authenticates a Gravatar user and returns an instance of [GravatarClient](https://github.com/mrtillman/grav.client)|
+|`fetch(email)`|pulls a Gravatar user from storage and returns an instance of *GravatarClient*|
 |`on(email)`|enable auto updates for a Gravatar user|
 |`off(email)`|disable auto updates for a Gravatar user|
-|`delete(emails)`|removes one or more Gravatar users from storage|
-|`collect()`|returns a list of email addresses for all Gravatar icons not updated in the past 24 hours|
-|`purge(days)`|removes all Gravatar users not updated in the past "x" number of days|
+|`delete(emails)`|deletes one or more Gravatar users from storage|
+|`collect()`|returns a list of email addresses for all Gravatars in the [Ready State](https://github.com/mrtillman/avatarbox.sdk/wiki/Glossary#ready-state)
+|`purge()`|removes all Gravatars in the [Cold State](https://github.com/mrtillman/avatarbox.sdk/wiki/Glossary#cold-state)|
 |`touch(email)`|sends an SQS message to [avatarbox.worker](https://github.com/mrtillman/avatarbox.worker)|
-|`renew(email)`|alters the timestamp indicating when the Gravatar icon was last updated|
+|`renew(email)`|sets the timestamp indicating when the Gravatar icon was last updated|
 
 ## License
 
