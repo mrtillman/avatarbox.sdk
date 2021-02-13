@@ -206,6 +206,30 @@ export namespace DynamoDBService {
       return null;
     }
 
+    public async dig(): Promise<(GravatarIcon | undefined)[] | null> {
+      const command = new ScanCommand({
+        TableName: this._tableName,
+        ScanFilter: {
+          last_updated: {
+            AttributeValueList: [{ N: this.calendar.yesterday() }],
+            ComparisonOperator: "GT",
+          },
+        },
+      });
+      const result = await this.scan(command);
+      if (result.Items && result.Items.length) {
+        return result.Items.map(
+          (item) =>
+            ({
+              email: item.email.S as string,
+              imageUrl: `https://www.gravatar.com/avatar/${item.email_hash.S}`,
+              lastUpdated: new Date(parseInt(item.last_updated.N as string)),
+            } as GravatarIcon)
+        );
+      }
+      return null;
+    }
+
     public async activateUser(email: string): Promise<void> {
       const result = await this._toggleUser(email, true);
       console.info(result);
