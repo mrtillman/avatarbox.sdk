@@ -206,28 +206,30 @@ export namespace DynamoDBService {
       return null;
     }
 
-    public async dig(): Promise<(GravatarIcon | undefined)[] | null> {
+    public async peek(): Promise<(GravatarIcon | undefined)[] | null> {
       const command = new ScanCommand({
         TableName: this._tableName,
         ScanFilter: {
           last_updated: {
-            AttributeValueList: [{ N: this.calendar.yesterday() }],
+            AttributeValueList: [{ N: this.calendar.hoursAgo(1) }],
             ComparisonOperator: "GT",
           },
         },
       });
-      const result = await this.scan(command);
-      if (result.Items && result.Items.length) {
-        return result.Items.map(
-          (item) =>
-            ({
-              email: item.email.S as string,
-              imageUrl: `https://www.gravatar.com/avatar/${item.email_hash.S}`,
-              lastUpdated: new Date(parseInt(item.last_updated.N as string)),
-            } as GravatarIcon)
-        );
-      }
-      return null;
+      return this._imageScan(command);
+    }
+
+    public async dig(days: number): Promise<(GravatarIcon | undefined)[] | null> {
+      const command = new ScanCommand({
+        TableName: this._tableName,
+        ScanFilter: {
+          last_updated: {
+            AttributeValueList: [{ N: this.calendar.daysAgo(days) }],
+            ComparisonOperator: "LE"
+          },
+        },
+      });
+      return this._imageScan(command);
     }
 
     public async activateUser(email: string): Promise<void> {
@@ -299,6 +301,21 @@ export namespace DynamoDBService {
         UpdateExpression: "SET #A = :a",
       });
       return await this.update(command);
+    }
+
+    private async _imageScan(command: ScanCommand):  Promise<(GravatarIcon | undefined)[] | null> {
+      const result = await this.scan(command);
+      if (result.Items && result.Items.length) {
+        return result.Items.map(
+          (item) =>
+            ({
+              email: item.email.S as string,
+              imageUrl: `https://www.gravatar.com/avatar/${item.email_hash.S}`,
+              lastUpdated: new Date(parseInt(item.last_updated.N as string)),
+            } as GravatarIcon)
+        );
+      }
+      return null;
     }
   }
 }

@@ -72,8 +72,11 @@ export class AvbxGravatarClient {
   public async collect(): Promise<(GravatarIcon | undefined)[] | null> {
     return await this.dynamo.collect();
   }
-  public async dig(): Promise<(GravatarIcon | undefined)[] | null> {
-    return await this.dynamo.dig();
+  public async peek(): Promise<(GravatarIcon | undefined)[] | null> {
+    return await this.dynamo.peek();
+  }
+  public async dig(days: number = 10): Promise<(GravatarIcon | undefined)[] | null> {
+    return await this.dynamo.dig(days);
   }
   public async purge(days: number = 10): Promise<void> {
     return await this.dynamo.purge(days);
