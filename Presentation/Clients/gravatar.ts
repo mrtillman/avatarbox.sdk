@@ -13,6 +13,8 @@ export class AvbxGravatarClient {
   public s3: S3Service.AvbxIcons;
 
   constructor() {
+    // TODO: create user service
+    // this.user = new UserService.Gravatar()
     this.s3 = new S3Service.AvbxIcons();
     this.kms = new KMSService(process.env.KMS_KEY_ID as string);
     this.dynamo = new DynamoDBService.Gravatar();
@@ -70,6 +72,7 @@ export class AvbxGravatarClient {
     await this.dynamo.deactivateUser(email);
   }
   public async delete(...emails: string[]): Promise<void> {
+    // TODO: also delete (batch delete) user's s3 icons
     if (emails.length == 1) {
       return await this.dynamo.deleteUser(emails[0]);
     }
@@ -85,12 +88,18 @@ export class AvbxGravatarClient {
     return await this.dynamo.dig(days);
   }
   public async purge(days: number = 10): Promise<void> {
+    // TODO: also delete (batch delete) user's s3 icons
     return await this.dynamo.purge(days);
   }
   public async touch(email: string): Promise<void> {
     await this.sqs.touch(email);
   }
-  public async renew(email: string, image_hash: string = ""): Promise<void> {
+  public async renew(email: string, imageUrl: string): Promise<void> {
+    // TODO: update user's s3 icon with the incoming imageUrl
+    
+    // TODO: compute image hash
+    const image_hash = ""
+
     await this.dynamo.renew(email, image_hash);
   }
 }

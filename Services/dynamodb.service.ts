@@ -143,14 +143,12 @@ export namespace DynamoDBService {
           },
         },
       });
-      // TODO: delete user's s3 icon
       const result = await this.delete(command);
       console.info(result);
     }
 
     public async deleteUsers(emails: string[]): Promise<void> {
       if (!emails.length) return;
-      // TODO: batch delete user's s3 icons
       const batchWriteInput = {
         RequestItems: {
           [this._tableName]: emails.map((email) => ({
