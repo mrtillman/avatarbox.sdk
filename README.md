@@ -86,7 +86,7 @@ const client = new AvbxGravatarClient();
 |`dig()`|returns a list of all Gravatars in the [Cold State](https://github.com/mrtillman/avatarbox.sdk/wiki/Glossary#cold-state)|
 |`purge()`|removes all Gravatars in the *Cold State*|
 |`touch(email)`|sends an SQS message to [avatarbox.worker](https://github.com/mrtillman/avatarbox.worker)|
-|`renew(email)`|sets the timestamp indicating when the Gravatar icon was last updated|
+|`renew(email, imageUrl)`|updates a Gravatar icon|
 
 ## License
 
