@@ -4,13 +4,16 @@ import { KMSService } from "../../Services/kms.service";
 import { DynamoDBService } from "../../Services/dynamodb.service";
 import { SQSService } from "../../Services/sqs.service";
 import { GravatarIcon } from "../../Domain/gravatar-icon";
+import { S3Service } from "../../Services/s3.service";
 
 export class AvbxGravatarClient {
   public kms: KMSService;
   public dynamo: DynamoDBService.Gravatar;
   public sqs: SQSService;
+  public s3: S3Service.AvbxIcons;
 
   constructor() {
+    this.s3 = new S3Service.AvbxIcons();
     this.kms = new KMSService(process.env.KMS_KEY_ID as string);
     this.dynamo = new DynamoDBService.Gravatar();
     this.sqs = new SQSService();
@@ -32,8 +35,11 @@ export class AvbxGravatarClient {
       const exists = await this.dynamo.findUser(user.email);
       if (exists) {
         await this.dynamo.updateUserPassword(user);
+        await this.s3.putIcon(`${client.gravatarImageUrl}?s=450`, exists.id);
       } else {
+        user.id = this.dynamo.calendar.today();
         await this.dynamo.putUser(user);
+        await this.s3.putIcon(`${client.gravatarImageUrl}?s=450`, user.id);
       }
     } catch (error) {
       console.error(error);

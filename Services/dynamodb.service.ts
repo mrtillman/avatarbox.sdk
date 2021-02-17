@@ -23,7 +23,7 @@ export namespace DynamoDBService {
     private _region: string;
 
     constructor() {
-      this._region = "us-east-1";
+      this._region = process.env.REGION as string;
       this.calendar = new DynamoDbCalendar();
       this.client = new DynamoDBClient({
         region: this._region,
@@ -75,7 +75,9 @@ export namespace DynamoDBService {
       const result = (await this.get(command)) as GetItemCommandOutput;
       if (result.Item) {
         return {
+          id: result.Item.id.N,
           email: result.Item.email.S,
+          emailHash: result.Item.email_hash.S,
           password: result.Item.password.S,
         } as GravatarUser;
       }
@@ -86,6 +88,9 @@ export namespace DynamoDBService {
       const command = new PutItemCommand({
         TableName: this._tableName,
         Item: {
+          id: {
+            N: user.id,
+          },
           email: {
             S: user.email,
           },
@@ -138,12 +143,14 @@ export namespace DynamoDBService {
           },
         },
       });
+      // TODO: delete user's s3 icon
       const result = await this.delete(command);
       console.info(result);
     }
 
     public async deleteUsers(emails: string[]): Promise<void> {
       if (!emails.length) return;
+      // TODO: batch delete user's s3 icons
       const batchWriteInput = {
         RequestItems: {
           [this._tableName]: emails.map((email) => ({
