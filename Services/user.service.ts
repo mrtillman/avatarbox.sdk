@@ -14,7 +14,7 @@ export namespace UserService {
 
     public async save(user: GravatarUser): Promise<string> {
       user.password = await this.kms.encrypt(user.password);
-      const exists = await this.dynamo.findUser(user.email);
+      const exists = await this.find(user.email);
       if (exists) {
         await this.dynamo.updateUserPassword(user);
         return exists.id;
@@ -24,9 +24,11 @@ export namespace UserService {
         return user.id;
       }
     }
-
+    public async find(email: string): Promise<GravatarUser | null> {
+      return await this.dynamo.findUser(email);
+    }
     public async getClient(email: string): Promise<GravatarClient> {
-      const user = await this.dynamo.findUser(email);
+      const user = await this.find(email);
       if (!user) return new GravatarClient("", "");
       const password = await this.kms.decrypt(user.password);
       return new GravatarClient(user.email, password);

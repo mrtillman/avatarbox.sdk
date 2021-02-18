@@ -83,7 +83,7 @@ export class AvbxGravatarClient {
     await this.sqs.touch(email);
   }
   public async reset(icon: GravatarIcon): Promise<void> {
-    const user = (await this.dynamo.findUser(icon.email)) as GravatarUser;
+    const user = (await this.user.find(icon.email)) as GravatarUser;
     await this.s3.putIcon(icon.imageUrl, user.id);
     await this.dynamo.reset(user.email);
   }
