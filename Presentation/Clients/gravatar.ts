@@ -84,8 +84,6 @@ export class AvbxGravatarClient {
   }
   public async reset(icon: GravatarIcon): Promise<void> {
     const user = (await this.dynamo.findUser(icon.email)) as GravatarUser;
-    // TODO: compute image hash for icon.imageUrl
-    //       and compare with user.imageHash
     await this.s3.putIcon(icon.imageUrl, user.id);
     await this.dynamo.reset(user.email);
   }

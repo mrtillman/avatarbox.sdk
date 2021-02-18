@@ -252,7 +252,7 @@ export namespace DynamoDBService {
       console.info(result);
     }
 
-    public async reset(email: string, image_hash: string = ""): Promise<void> {
+    public async reset(email: string): Promise<void> {
       const today = this.calendar.today();
       const command = new UpdateItemCommand({
         TableName: this._tableName,
@@ -261,29 +261,15 @@ export namespace DynamoDBService {
             S: email,
           },
         },
-        ExpressionAttributeNames: image_hash
-          ? {
-              "#I": "image_hash",
-              "#L": "last_updated",
-            }
-          : {
-              "#L": "last_updated",
-            },
-        ExpressionAttributeValues: image_hash
-          ? {
-              ":i": {
-                S: image_hash,
-              },
-              ":l": {
-                N: today,
-              },
-            }
-          : {
-              ":l": {
-                N: today,
-              },
-            },
-        UpdateExpression: "SET #L = :l" + (image_hash ? ", #I = :i" : ""),
+        ExpressionAttributeNames: {
+          "#L": "last_updated",
+        },
+        ExpressionAttributeValues: {
+          ":l": {
+            N: today,
+          },
+        },
+        UpdateExpression: "SET #L = :l",
       });
       const result = await this.update(command);
       console.info(result);
