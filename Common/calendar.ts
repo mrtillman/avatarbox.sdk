@@ -21,7 +21,7 @@ export class DynamoDbCalendar {
   constructor() {
     this._calendar = new Calendar();
   }
-  
+
   yesterday(): string {
     return this._calendar.yesterday().getTime().toString();
   }

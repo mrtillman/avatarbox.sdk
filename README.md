@@ -80,13 +80,13 @@ const client = new AvbxGravatarClient();
 |`fetch(email)`|pulls a Gravatar user from storage and returns an instance of *GravatarClient*|
 |`on(email)`|enable auto updates for a Gravatar user|
 |`off(email)`|disable auto updates for a Gravatar user|
-|`delete(emails)`|deletes one or more Gravatar users from storage|
+|`delete(users)`|deletes one or more [GravatarUser](https://github.com/mrtillman/avatarbox.sdk/blob/master/Domain/gravatar-user.ts)s from storage|
 |`collect()`|returns a list of all Gravatars in the [Ready State](https://github.com/mrtillman/avatarbox.sdk/wiki/Glossary#ready-state)|
 |`peek()`|returns a list of all Gravatars in the [Fresh State](https://github.com/mrtillman/avatarbox.sdk/wiki/Glossary#fresh-state)|
 |`dig()`|returns a list of all Gravatars in the [Cold State](https://github.com/mrtillman/avatarbox.sdk/wiki/Glossary#cold-state)|
 |`purge()`|removes all Gravatars in the *Cold State*|
 |`touch(email)`|sends an SQS message to [avatarbox.worker](https://github.com/mrtillman/avatarbox.worker)|
-|`renew(email, imageUrl)`|updates a Gravatar icon|
+|`reset(icon)`|replaces the [GravatarIcon](https://github.com/mrtillman/avatarbox.sdk/blob/master/Domain/gravatar-icon.ts) in S3 and then updates the timestamp|
 
 ## License
 

@@ -163,7 +163,7 @@ export namespace DynamoDBService {
       console.info(result);
     }
 
-    public async purge(days: number): Promise<void> {
+    public async purge(days: number): Promise<string[]> {
       const scanCommand = new ScanCommand({
         TableName: this._tableName,
         ScanFilter: {
@@ -175,12 +175,15 @@ export namespace DynamoDBService {
       });
       const scanResult = await this.scan(scanCommand);
       const emails: string[] = [];
+      const userIds: string[] = [];
       if (scanResult.Items && scanResult.Items.length) {
         scanResult.Items.forEach((item) => {
           emails.push(item.email.S as string);
+          userIds.push(item.id.N as string);
         });
       }
       await this.deleteUsers(emails);
+      return userIds;
     }
 
     public async collect(): Promise<(GravatarIcon | undefined)[] | null> {
@@ -224,13 +227,15 @@ export namespace DynamoDBService {
       return this._imageScan(command);
     }
 
-    public async dig(days: number): Promise<(GravatarIcon | undefined)[] | null> {
+    public async dig(
+      days: number
+    ): Promise<(GravatarIcon | undefined)[] | null> {
       const command = new ScanCommand({
         TableName: this._tableName,
         ScanFilter: {
           last_updated: {
             AttributeValueList: [{ N: this.calendar.daysAgo(days) }],
-            ComparisonOperator: "LE"
+            ComparisonOperator: "LE",
           },
         },
       });
@@ -247,7 +252,7 @@ export namespace DynamoDBService {
       console.info(result);
     }
 
-    public async renew(email: string, image_hash: string): Promise<void> {
+    public async reset(email: string, image_hash: string = ""): Promise<void> {
       const today = this.calendar.today();
       const command = new UpdateItemCommand({
         TableName: this._tableName,
@@ -308,7 +313,9 @@ export namespace DynamoDBService {
       return await this.update(command);
     }
 
-    private async _imageScan(command: ScanCommand):  Promise<(GravatarIcon | undefined)[] | null> {
+    private async _imageScan(
+      command: ScanCommand
+    ): Promise<(GravatarIcon | undefined)[] | null> {
       const result = await this.scan(command);
       if (result.Items && result.Items.length) {
         return result.Items.map(
