@@ -1,19 +1,23 @@
 import { GravatarClient } from "grav.client";
-import { GravatarUser } from "../../Domain/gravatar-user";
-import { KMSService } from "../../Services/kms.service";
 import { DynamoDBService } from "../../Services/dynamodb.service";
 import { SQSService } from "../../Services/sqs.service";
 import { GravatarIcon } from "../../Domain/gravatar-icon";
+import { S3Service } from "../../Services/s3.service";
+import { UserService } from "../../Services/user.service";
+import { GravatarUser } from "../../Domain/gravatar-user";
 
 export class AvbxGravatarClient {
-  public kms: KMSService;
   public dynamo: DynamoDBService.Gravatar;
   public sqs: SQSService;
+  public s3: S3Service.AvbxIcons;
+  public user: UserService.Gravatar;
 
   constructor() {
-    this.kms = new KMSService(process.env.KMS_KEY_ID as string);
+    this.s3 = new S3Service.AvbxIcons();
     this.dynamo = new DynamoDBService.Gravatar();
     this.sqs = new SQSService();
+    this.user = new UserService.Gravatar();
+    this.user.dynamo = this.dynamo;
   }
 
   public async login(
@@ -24,17 +28,12 @@ export class AvbxGravatarClient {
 
     try {
       await client.test();
-      const user = {
+      const userId = await this.user.save({
         email,
+        password,
         emailHash: client.emailHash,
-      } as GravatarUser;
-      user.password = await this.kms.encrypt(password);
-      const exists = await this.dynamo.findUser(user.email);
-      if (exists) {
-        await this.dynamo.updateUserPassword(user);
-      } else {
-        await this.dynamo.putUser(user);
-      }
+      } as GravatarUser);
+      await this.s3.putIcon(`${client.gravatarImageUrl}?s=450`, userId);
     } catch (error) {
       console.error(error);
       return null;
@@ -44,10 +43,7 @@ export class AvbxGravatarClient {
   }
 
   public async fetch(email: string): Promise<GravatarClient | null> {
-    const user = await this.dynamo.findUser(email);
-    if (!user) return null;
-    const password = await this.kms.decrypt(user.password);
-    const client = new GravatarClient(user.email, password);
+    const client = await this.user.getClient(email);
     try {
       await client.test();
     } catch (error) {
@@ -58,30 +54,37 @@ export class AvbxGravatarClient {
   }
 
   public async on(email: string): Promise<void> {
-    await this.dynamo.activateUser(email);
+    await this.user.on(email);
   }
   public async off(email: string): Promise<void> {
-    await this.dynamo.deactivateUser(email);
+    await this.user.off(email);
   }
-  public async delete(...emails: string[]): Promise<void> {
-    if (emails.length == 1) {
-      return await this.dynamo.deleteUser(emails[0]);
-    }
-    return await this.dynamo.deleteUsers(emails);
+  public async delete(...users: GravatarUser[]): Promise<void> {
+    const userIds = users.map((user) => user.id);
+    await this.s3.deleteIcons(...userIds);
+    await this.user.delete(...users);
   }
   public async collect(): Promise<(GravatarIcon | undefined)[] | null> {
     return await this.dynamo.collect();
   }
-  public async dig(): Promise<(GravatarIcon | undefined)[] | null> {
-    return await this.dynamo.dig();
+  public async peek(): Promise<(GravatarIcon | undefined)[] | null> {
+    return await this.dynamo.peek();
   }
-  public async purge(days: number = 10): Promise<void> {
-    return await this.dynamo.purge(days);
+  public async dig(
+    days: number = 10
+  ): Promise<(GravatarIcon | undefined)[] | null> {
+    return await this.dynamo.dig(days);
+  }
+  public async sweep(days: number = 10): Promise<void> {
+    const userIds = await this.dynamo.sweep(days);
+    await this.s3.deleteIcons(...userIds);
   }
   public async touch(email: string): Promise<void> {
     await this.sqs.touch(email);
   }
-  public async renew(email: string, image_hash: string = ""): Promise<void> {
-    await this.dynamo.renew(email, image_hash);
+  public async reset(icon: GravatarIcon): Promise<void> {
+    const user = (await this.user.find(icon.email)) as GravatarUser;
+    await this.s3.putIcon(icon.imageUrl, user.id);
+    await this.dynamo.reset(user.email);
   }
 }

@@ -76,16 +76,17 @@ const client = new AvbxGravatarClient();
 
 |Method|Description|
 |---|---|
-|`login(email, password)`|authenticates a Gravatar user and returns an instance of [GravatarClient](https://github.com/mrtillman/grav.client)|
+|`login(email,password)`|authenticates a Gravatar user and returns an instance of [GravatarClient](https://github.com/mrtillman/grav.client)|
 |`fetch(email)`|pulls a Gravatar user from storage and returns an instance of *GravatarClient*|
 |`on(email)`|enable auto updates for a Gravatar user|
 |`off(email)`|disable auto updates for a Gravatar user|
-|`delete(emails)`|deletes one or more Gravatar users from storage|
+|`delete(users)`|deletes one or more [GravatarUser](https://github.com/mrtillman/avatarbox.sdk/blob/master/Domain/gravatar-user.ts)s from storage|
 |`collect()`|returns a list of all Gravatars in the [Ready State](https://github.com/mrtillman/avatarbox.sdk/wiki/Glossary#ready-state)|
-|`dig()`|returns a list of all Gravatars in the [Fresh State](https://github.com/mrtillman/avatarbox.sdk/wiki/Glossary#fresh)|
-|`purge()`|removes all Gravatars in the [Cold State](https://github.com/mrtillman/avatarbox.sdk/wiki/Glossary#cold-state)|
+|`peek()`|returns a list of all Gravatars in the [Fresh State](https://github.com/mrtillman/avatarbox.sdk/wiki/Glossary#fresh-state)|
+|`dig()`|returns a list of all Gravatars in the [Cold State](https://github.com/mrtillman/avatarbox.sdk/wiki/Glossary#cold-state)|
+|`sweep()`|removes all Gravatars in the *Cold State*|
 |`touch(email)`|sends an SQS message to [avatarbox.worker](https://github.com/mrtillman/avatarbox.worker)|
-|`renew(email)`|sets the timestamp indicating when the Gravatar icon was last updated|
+|`reset(icon)`|resets the timestamp indicating when the [GravatarIcon](https://github.com/mrtillman/avatarbox.sdk/blob/master/Domain/gravatar-icon.ts) was last updated |
 
 ## License
 

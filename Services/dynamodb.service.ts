@@ -23,7 +23,7 @@ export namespace DynamoDBService {
     private _region: string;
 
     constructor() {
-      this._region = "us-east-1";
+      this._region = process.env.REGION as string;
       this.calendar = new DynamoDbCalendar();
       this.client = new DynamoDBClient({
         region: this._region,
@@ -75,7 +75,9 @@ export namespace DynamoDBService {
       const result = (await this.get(command)) as GetItemCommandOutput;
       if (result.Item) {
         return {
+          id: result.Item.id.N,
           email: result.Item.email.S,
+          emailHash: result.Item.email_hash.S,
           password: result.Item.password.S,
         } as GravatarUser;
       }
@@ -86,6 +88,9 @@ export namespace DynamoDBService {
       const command = new PutItemCommand({
         TableName: this._tableName,
         Item: {
+          id: {
+            N: user.id,
+          },
           email: {
             S: user.email,
           },
@@ -158,7 +163,7 @@ export namespace DynamoDBService {
       console.info(result);
     }
 
-    public async purge(days: number): Promise<void> {
+    public async sweep(days: number): Promise<string[]> {
       const scanCommand = new ScanCommand({
         TableName: this._tableName,
         ScanFilter: {
@@ -170,12 +175,15 @@ export namespace DynamoDBService {
       });
       const scanResult = await this.scan(scanCommand);
       const emails: string[] = [];
+      const userIds: string[] = [];
       if (scanResult.Items && scanResult.Items.length) {
         scanResult.Items.forEach((item) => {
           emails.push(item.email.S as string);
+          userIds.push(item.id.N as string);
         });
       }
       await this.deleteUsers(emails);
+      return userIds;
     }
 
     public async collect(): Promise<(GravatarIcon | undefined)[] | null> {
@@ -206,28 +214,32 @@ export namespace DynamoDBService {
       return null;
     }
 
-    public async dig(): Promise<(GravatarIcon | undefined)[] | null> {
+    public async peek(): Promise<(GravatarIcon | undefined)[] | null> {
       const command = new ScanCommand({
         TableName: this._tableName,
         ScanFilter: {
           last_updated: {
-            AttributeValueList: [{ N: this.calendar.yesterday() }],
+            AttributeValueList: [{ N: this.calendar.hoursAgo(1) }],
             ComparisonOperator: "GT",
           },
         },
       });
-      const result = await this.scan(command);
-      if (result.Items && result.Items.length) {
-        return result.Items.map(
-          (item) =>
-            ({
-              email: item.email.S as string,
-              imageUrl: `https://www.gravatar.com/avatar/${item.email_hash.S}`,
-              lastUpdated: new Date(parseInt(item.last_updated.N as string)),
-            } as GravatarIcon)
-        );
-      }
-      return null;
+      return this._imageScan(command);
+    }
+
+    public async dig(
+      days: number
+    ): Promise<(GravatarIcon | undefined)[] | null> {
+      const command = new ScanCommand({
+        TableName: this._tableName,
+        ScanFilter: {
+          last_updated: {
+            AttributeValueList: [{ N: this.calendar.daysAgo(days) }],
+            ComparisonOperator: "LE",
+          },
+        },
+      });
+      return this._imageScan(command);
     }
 
     public async activateUser(email: string): Promise<void> {
@@ -240,7 +252,7 @@ export namespace DynamoDBService {
       console.info(result);
     }
 
-    public async renew(email: string, image_hash: string): Promise<void> {
+    public async reset(email: string): Promise<void> {
       const today = this.calendar.today();
       const command = new UpdateItemCommand({
         TableName: this._tableName,
@@ -249,29 +261,15 @@ export namespace DynamoDBService {
             S: email,
           },
         },
-        ExpressionAttributeNames: image_hash
-          ? {
-              "#I": "image_hash",
-              "#L": "last_updated",
-            }
-          : {
-              "#L": "last_updated",
-            },
-        ExpressionAttributeValues: image_hash
-          ? {
-              ":i": {
-                S: image_hash,
-              },
-              ":l": {
-                N: today,
-              },
-            }
-          : {
-              ":l": {
-                N: today,
-              },
-            },
-        UpdateExpression: "SET #L = :l" + (image_hash ? ", #I = :i" : ""),
+        ExpressionAttributeNames: {
+          "#L": "last_updated",
+        },
+        ExpressionAttributeValues: {
+          ":l": {
+            N: today,
+          },
+        },
+        UpdateExpression: "SET #L = :l",
       });
       const result = await this.update(command);
       console.info(result);
@@ -299,6 +297,23 @@ export namespace DynamoDBService {
         UpdateExpression: "SET #A = :a",
       });
       return await this.update(command);
+    }
+
+    private async _imageScan(
+      command: ScanCommand
+    ): Promise<(GravatarIcon | undefined)[] | null> {
+      const result = await this.scan(command);
+      if (result.Items && result.Items.length) {
+        return result.Items.map(
+          (item) =>
+            ({
+              email: item.email.S as string,
+              imageUrl: `https://www.gravatar.com/avatar/${item.email_hash.S}`,
+              lastUpdated: new Date(parseInt(item.last_updated.N as string)),
+            } as GravatarIcon)
+        );
+      }
+      return null;
     }
   }
 }
