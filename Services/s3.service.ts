@@ -2,16 +2,20 @@ import * as https from "https";
 import {
   S3Client,
   DeleteObjectCommand,
+  DeleteObjectsCommand,
   ServiceOutputTypes,
   PutObjectCommand,
   DeleteObjectsCommandOutput,
+  ObjectIdentifier,
 } from "@aws-sdk/client-s3";
 import { Calendar } from "../Common/calendar";
 
 class S3ServiceBase {
   protected _client: S3Client;
+  protected _bucketName: string;
 
   constructor() {
+    this._bucketName = "icons.avatarbox.io";
     this._client = new S3Client({
       region: process.env.REGION as string,
     });
@@ -43,7 +47,7 @@ export namespace S3Service {
       if (!key) return null;
 
       const command = new DeleteObjectCommand({
-        Bucket: "icons.avatarbox.io",
+        Bucket: this._bucketName,
         Key: key,
       });
 
@@ -64,7 +68,7 @@ export namespace S3Service {
               const contentType = response.headers["content-type"] as string;
 
               const command = new PutObjectCommand({
-                Bucket: "icons.avatarbox.io",
+                Bucket: this._bucketName,
                 ACL: "public-read",
                 Key: `u/${_timestamp}`,
                 ContentType: contentType,
@@ -90,8 +94,15 @@ export namespace S3Service {
         return;
       }
       const keys = userIds.map((userId) => `u/${userId}`);
-      // console.log('s3 batch delete: ', keys);
-      // TODO: batch delete s3 icons
+      const command = new DeleteObjectsCommand({
+          Bucket: this._bucketName,
+          Delete: {
+            Objects: keys.map(key => ({
+              Key: key
+            } as ObjectIdentifier))
+          }
+      });
+      this._client.send(command);
     }
   }
 }
