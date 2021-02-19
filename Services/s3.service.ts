@@ -57,7 +57,7 @@ export namespace S3Service {
         https
           .request(imageUrl, async (response) => {
             try {
-              const _timestamp = timestamp ? timestamp : this._calendar.today();
+              const _timestamp = timestamp ? timestamp : this._calendar.now();
               const contentLength = response.headers[
                 "content-length"
               ] as string;

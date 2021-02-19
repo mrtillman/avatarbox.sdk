@@ -19,7 +19,7 @@ export namespace UserService {
         await this.dynamo.updateUserPassword(user);
         return exists.id;
       } else {
-        user.id = this.dynamo.calendar.today();
+        user.id = this.dynamo.calendar.now();
         await this.dynamo.putUser(user);
         return user.id;
       }
