@@ -253,7 +253,7 @@ export namespace DynamoDBService {
     }
 
     public async reset(email: string): Promise<void> {
-      const now = this.calendar.now();
+      const today = this.calendar.today();
       const command = new UpdateItemCommand({
         TableName: this._tableName,
         Key: {
@@ -266,7 +266,7 @@ export namespace DynamoDBService {
         },
         ExpressionAttributeValues: {
           ":l": {
-            N: now,
+            N: today,
           },
         },
         UpdateExpression: "SET #L = :l",
