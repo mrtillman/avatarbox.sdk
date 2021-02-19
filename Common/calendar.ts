@@ -13,6 +13,9 @@ export class Calendar {
   today(): Date {
     return moment().startOf("minute").toDate();
   }
+  now(): Date {
+    return moment().toDate();
+  }
 }
 
 export class DynamoDbCalendar {
@@ -33,5 +36,8 @@ export class DynamoDbCalendar {
   }
   today(): string {
     return this._calendar.today().getTime().toString();
+  }
+  now(): string {
+    return this._calendar.now().getTime().toString();
   }
 }
