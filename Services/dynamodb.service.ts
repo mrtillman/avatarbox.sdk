@@ -163,7 +163,7 @@ export namespace DynamoDBService {
       console.info(result);
     }
 
-    public async purge(days: number): Promise<string[]> {
+    public async sweep(days: number): Promise<string[]> {
       const scanCommand = new ScanCommand({
         TableName: this._tableName,
         ScanFilter: {

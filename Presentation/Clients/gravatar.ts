@@ -75,8 +75,8 @@ export class AvbxGravatarClient {
   ): Promise<(GravatarIcon | undefined)[] | null> {
     return await this.dynamo.dig(days);
   }
-  public async purge(days: number = 10): Promise<void> {
-    const userIds = await this.dynamo.purge(days);
+  public async sweep(days: number = 10): Promise<void> {
+    const userIds = await this.dynamo.sweep(days);
     await this.s3.deleteIcons(...userIds);
   }
   public async touch(email: string): Promise<void> {
