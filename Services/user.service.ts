@@ -2,6 +2,7 @@ import { KMSService } from "./kms.service";
 import { GravatarUser } from "../Domain/gravatar-user";
 import { DynamoDBService } from "./dynamodb.service";
 import { GravatarClient } from "grav.client";
+import { MySqlService } from "../Services/mysql.service";
 
 export namespace UserService {
   export class Gravatar {
@@ -13,16 +14,22 @@ export namespace UserService {
     }
 
     public async save(user: GravatarUser): Promise<string> {
+      const mysql = new MySqlService.Gravatar();
       user.password = await this.kms.encrypt(user.password);
       const exists = await this.find(user.email);
+      let userId = null;
       if (exists) {
         await this.dynamo.updateUserPassword(user);
-        return exists.id;
+        await mysql.update(exists.emailHash, user.password);
+        userId = exists.id;
       } else {
         user.id = this.dynamo.calendar.now();
         await this.dynamo.putUser(user);
-        return user.id;
+        await mysql.save(user.emailHash, user.password);
+        userId = user.id;
       }
+      mysql.end();
+      return userId;
     }
     public async find(email: string): Promise<GravatarUser | null> {
       return await this.dynamo.findUser(email);
