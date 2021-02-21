@@ -19,13 +19,14 @@ export namespace UserService {
       const exists = await this.find(user.email);
       let userId = null;
       if (exists) {
+        user.id = exists.id;
         await this.dynamo.updateUserPassword(user);
-        await mysql.update(exists.emailHash, user.password);
+        await mysql.update(user);
         userId = exists.id;
       } else {
         user.id = this.dynamo.calendar.now();
         await this.dynamo.putUser(user);
-        await mysql.save(user.emailHash, user.password);
+        await mysql.save(user);
         userId = user.id;
       }
       mysql.end();
@@ -50,11 +51,19 @@ export namespace UserService {
     }
 
     public async delete(...users: GravatarUser[]): Promise<void> {
+      const mysql = new MySqlService.Gravatar();
+
       if (users.length == 1) {
-        return await this.dynamo.deleteUser(users[0].email);
+        const user = users[0];
+        await mysql.delete(user.id);
+        await this.dynamo.deleteUser(user.email);
+      } else {
+        const emails = users.map((user) => user.email);
+        await mysql.delete(...users.map(user => user.id));
+        await this.dynamo.deleteUsers(emails);
       }
-      const emails = users.map((user) => user.email);
-      return await this.dynamo.deleteUsers(emails);
+
+      mysql.end();
     }
   }
 }

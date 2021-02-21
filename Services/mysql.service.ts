@@ -1,4 +1,5 @@
 import * as mysql from 'mysql';
+import { GravatarUser } from '../Domain/gravatar-user';
 
 export namespace MySqlService {
 
@@ -27,14 +28,18 @@ export namespace MySqlService {
     constructor() {
       super();
     }
-    async save(username: string, passphrase: string): Promise<void> {
-      this.execute(`INSERT INTO users (username, passphrase)
-                    VALUES ('${username}', '${passphrase}')`);
+    async save(user: GravatarUser): Promise<void> {
+      this.execute(`INSERT INTO users (id, hash, secret)
+                    VALUES (${user.id}, '${user.emailHash}', '${user.password}')`);
     }
-    async update(username: string, passphrase: string): Promise<void> {
+    async update(user: GravatarUser): Promise<void> {
       this.execute(`UPDATE users
-                    SET passphrase = '${passphrase}'
-                    WHERE username = '${username}'`);
+                    SET secret = '${user.password}'
+                    WHERE id = ${user.id}`);
+    }
+    async delete(...ids: string[]){
+      this.execute(`DELETE FROM users
+                    WHERE id IN (${ids.join(',')})`);
     }
     end(){
       this._connection.end();
