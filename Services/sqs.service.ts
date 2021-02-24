@@ -13,7 +13,6 @@ export class SQSService {
       MessageBody: email,
       QueueUrl: process.env.QUEUE_URL,
     });
-    const result = await this.client.send(command);
-    console.log(result);
+    await this.client.send(command);
   }
 }

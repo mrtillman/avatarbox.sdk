@@ -95,12 +95,15 @@ export namespace S3Service {
       }
       const keys = userIds.map((userId) => `u/${userId}`);
       const command = new DeleteObjectsCommand({
-          Bucket: this._bucketName,
-          Delete: {
-            Objects: keys.map(key => ({
-              Key: key
-            } as ObjectIdentifier))
-          }
+        Bucket: this._bucketName,
+        Delete: {
+          Objects: keys.map(
+            (key) =>
+              ({
+                Key: key,
+              } as ObjectIdentifier)
+          ),
+        },
       });
       this._client.send(command);
     }
