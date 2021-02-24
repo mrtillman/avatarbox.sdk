@@ -33,7 +33,7 @@
 |Name|`avbx-worker-queue`|
 |Type|Standard|
 
-> a. To avoid [cold start issues](https://github.com/mrtillman/avatarbox.worker/wiki/Resolving-Cold-Start-Issues), set up an EventBridge rule that triggers `avbx-worker` periodically. <br/>b. This table forms part of a [database connection](https://auth0.com/docs/connections/database) that supports the [Auth0 Integration](https://github.com/mrtillman/avatarbox.api/wiki/Auth0-Integration#api-tokens).<br/> c. Use [avatarbox.worker](https://github.com/mrtillman/avatarbox.worker) to define this Lambda function.
+> a. To avoid [cold start issues](https://github.com/mrtillman/avatarbox.worker/wiki/Resolving-Cold-Start-Issues), set up an EventBridge rule that triggers `avbx-worker` periodically. <br/>b. This table forms part of a [database connection](https://auth0.com/docs/connections/database) that supports the [Auth0 Integration](https://github.com/mrtillman/avatarbox.api/wiki/Auth0-Integration).<br/> c. Use [avatarbox.worker](https://github.com/mrtillman/avatarbox.worker) to define this Lambda function.
 
 ## Installation
 
