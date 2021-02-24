@@ -3,14 +3,17 @@ import { GravatarUser } from "../Domain/gravatar-user";
 import { DynamoDBService } from "./dynamodb.service";
 import { GravatarClient } from "grav.client";
 import { MySqlService } from "../Services/mysql.service";
+import { BcryptService } from "./bcrypt.service";
 
 export namespace UserService {
   export class Gravatar {
     public kms: KMSService;
     public dynamo: DynamoDBService.Gravatar;
+    public bcrypt: BcryptService;
 
     constructor() {
       this.kms = new KMSService(process.env.KMS_KEY_ID as string);
+      this.bcrypt = new BcryptService();
     }
 
     public async save(user: GravatarUser): Promise<string> {
@@ -26,6 +29,7 @@ export namespace UserService {
       } else {
         user.id = this.dynamo.calendar.now();
         await this.dynamo.putUser(user);
+        user.emailHash = await this.bcrypt.hash(user.emailHash);
         await mysql.save(user);
         userId = user.id;
       }
@@ -59,7 +63,7 @@ export namespace UserService {
         await this.dynamo.deleteUser(user.email);
       } else {
         const emails = users.map((user) => user.email);
-        await mysql.delete(...users.map(user => user.id));
+        await mysql.delete(...users.map((user) => user.id));
         await this.dynamo.deleteUsers(emails);
       }
 
