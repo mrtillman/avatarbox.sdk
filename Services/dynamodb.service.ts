@@ -2,6 +2,7 @@ import {
   DynamoDBClient,
   GetItemCommand,
   UpdateItemCommand,
+  QueryCommand,
   PutItemCommand,
   DeleteItemCommand,
   ServiceOutputTypes,
@@ -10,6 +11,7 @@ import {
   ScanCommandOutput,
   BatchWriteItemCommand,
   BatchWriteItemCommandOutput,
+  QueryCommandOutput,
 } from "@aws-sdk/client-dynamodb";
 import { GravatarUser } from "../Domain/gravatar-user";
 import { DynamoDbCalendar } from "../Common/calendar";
@@ -48,6 +50,9 @@ export namespace DynamoDBService {
     protected async scan(command: ScanCommand): Promise<ScanCommandOutput> {
       return await this.client.send(command);
     }
+    protected async query(command: QueryCommand): Promise<ScanCommandOutput> {
+      return await this.client.send(command);
+    }
     protected async batchWrite(
       command: BatchWriteItemCommand
     ): Promise<BatchWriteItemCommandOutput> {
@@ -82,6 +87,28 @@ export namespace DynamoDBService {
         } as GravatarUser;
       }
       return null;
+    }
+
+    public async findUserById(id: string): Promise<GravatarUser | null> {
+      const command = new QueryCommand({
+        TableName: this._tableName,
+        IndexName: 'index-id-email',
+        ExpressionAttributeValues: {
+          ":id": {
+            N: id
+           }
+        }, 
+        KeyConditionExpression: "id = :id"
+      });
+      const result = (await this.query(command)) as QueryCommandOutput;
+      if(result.Count == 0) return null;
+      const user = (result.Items && result.Items[0]) as any;
+      return user && {
+        id: user.id.N,
+        email: user.email.S,
+        emailHash: user.email_hash.S,
+        password: user.password.S,
+      } as GravatarUser;
     }
 
     public async putUser(user: GravatarUser): Promise<void> {

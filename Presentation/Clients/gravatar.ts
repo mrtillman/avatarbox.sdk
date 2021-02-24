@@ -42,8 +42,11 @@ export class AvbxGravatarClient {
     return client;
   }
 
-  public async fetch(email: string): Promise<GravatarClient | null> {
-    const client = await this.user.getClient(email);
+  public async fetch(id: string): Promise<GravatarClient | null> {
+    const user = isNaN(parseInt(id))
+      ? await this.user.find(id)
+      : await this.user.findById(id);
+    const client = await this.user.getClient(user);
     try {
       await client.test();
     } catch (error) {

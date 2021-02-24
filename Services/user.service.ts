@@ -39,21 +39,20 @@ export namespace UserService {
     public async find(email: string): Promise<GravatarUser | null> {
       return await this.dynamo.findUser(email);
     }
-    public async getClient(email: string): Promise<GravatarClient> {
-      const user = await this.find(email);
+    public async findById(id: string): Promise<GravatarUser | null> {
+      return await this.dynamo.findUserById(id);
+    }
+    public async getClient(user: GravatarUser | null): Promise<GravatarClient> {
       if (!user) return new GravatarClient("", "");
       const password = await this.kms.decrypt(user.password);
       return new GravatarClient(user.email, password);
     }
-
     public async on(email: string): Promise<void> {
       await this.dynamo.activateUser(email);
     }
-
     public async off(email: string): Promise<void> {
       await this.dynamo.deactivateUser(email);
     }
-
     public async delete(...users: GravatarUser[]): Promise<void> {
       const mysql = new MySqlService.Gravatar();
 

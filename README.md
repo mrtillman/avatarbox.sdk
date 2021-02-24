@@ -20,7 +20,9 @@
 ## Checklist
 
 - EventBridge Pre-Warm Rule <sup>a.</sup>
-- DynamoDB table called `Gravatars` with `email` as the partition key
+- DynamoDB table called `Gravatars` 
+  - set `email` as the partition key
+  - create [Global Secondary Index](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/GSI.html) called `index-id-email`, where `id (Number)` is the partition key, and `email (String)` is the sort key.
 - KMS Symmetric Key
 - MySQL table: [gravatar.users](https://github.com/mrtillman/avatarbox.sdk/blob/master/gravatar.users.sql) <sup>b.</sup>
 - SQS Queue
@@ -83,7 +85,7 @@ const client = new AvbxGravatarClient();
 |Method|Description|
 |---|---|
 |`login(email,password)`|authenticates a Gravatar user and returns an instance of [GravatarClient](https://github.com/mrtillman/grav.client)|
-|`fetch(email)`|pulls a Gravatar user from storage and returns an instance of *GravatarClient*|
+|`fetch(id)`|finds a Gravatar user by `id` or `email` and returns an instance of *GravatarClient*|
 |`on(email)`|enable auto updates for a Gravatar user|
 |`off(email)`|disable auto updates for a Gravatar user|
 |`delete(users)`|deletes one or more [GravatarUser](https://github.com/mrtillman/avatarbox.sdk/blob/master/Domain/gravatar-user.ts)s from storage|
