@@ -15,24 +15,25 @@
 
 ## Description
 
-**avatarbox.sdk** was designed to facilitate the development of application components such as [avatarbox.publisher](https://github.com/mrtillman/avatarbox.publisher) and [avatarbox.worker](https://github.com/mrtillman/avatarbox.worker), however it also supports [avatarbox.app](https://github.com/mrtillman/avatarbox.app) and [avatarbox.api](https://github.com/mrtillman/avatarbox.api).
+**avatarbox.sdk** is a library designed to facilitate the development of application components such as [avatarbox.publisher](https://github.com/mrtillman/avatarbox.publisher) and [avatarbox.worker](https://github.com/mrtillman/avatarbox.worker), however it also supports [avatarbox.app](https://github.com/mrtillman/avatarbox.app) and [avatarbox.api](https://github.com/mrtillman/avatarbox.api).
 
 ## Checklist
 
+- EventBridge Pre-Warm Rule <sup>a.</sup>
 - DynamoDB table called `Gravatars` with `email` as the partition key
 - KMS Symmetric Key
+- MySQL table: [gravatar.users](https://github.com/mrtillman/avatarbox.sdk/blob/master/gravatar.users.sql) <sup>b.</sup>
 - SQS Queue
 
 *SQS Queue Setup:*
 
 |Setting|Description|
 |---|---|
-|Delivery Delay|3 Seconds <sup>a.</sup>|
-|Lambda Triggers|`avbx-worker` <sup>b.</sup>|
+|Lambda Triggers|`avbx-worker` <sup>c.</sup>|
 |Name|`avbx-worker-queue`|
 |Type|Standard|
 
-> a. Postpone delivery of new messages to avoid [cold start issues](https://github.com/mrtillman/avatarbox.worker/wiki/Resolving-Cold-Start-Issues). <br/>b. Use [avatarbox.worker](https://github.com/mrtillman/avatarbox.worker) to define this Lambda function.
+> a. To avoid [cold start issues](https://github.com/mrtillman/avatarbox.worker/wiki/Resolving-Cold-Start-Issues), set up an EventBridge rule that triggers `avbx-worker` periodically. <br/>b. This table forms part of a [database connection](https://auth0.com/docs/connections/database) that supports the [Auth0 Integration](https://github.com/mrtillman/avatarbox.api/wiki/Auth0-Integration#api-tokens).<br/> c. Use [avatarbox.worker](https://github.com/mrtillman/avatarbox.worker) to define this Lambda function.
 
 ## Installation
 
@@ -44,12 +45,17 @@ $ git clone https://github.com/mrtillman/avatarbox.sdk.git
 $ cd avatarbox.sdk && npm install
 ```
 
-Next, find [.env.demo](https://github.com/mrtillman/avatarbox.sdk/blob/master/.env.demo), rename it to `.env` and set the values:
+Next, find [.env.demo](https://github.com/mrtillman/avatarbox.sdk/blob/master/.env.demo), rename it to `.env` and modify:
 
 ```sh
 KMS_KEY_ID={YOUR-KMS-KEY-ID}
 REGION=us-east-1
 QUEUE_URL={YOUR-SQS-QUEUE-URL}
+MYSQL_HOST=127.0.0.1
+MYSQL_PORT=3306
+MYSQL_USER=mrtillman
+MYSQL_PASSWORD=letmein
+MYSQL_DATABASE=gravatar
 ```
 
 <!--
