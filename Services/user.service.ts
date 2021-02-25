@@ -24,7 +24,6 @@ export namespace UserService {
       if (exists) {
         user.id = exists.id;
         await this.dynamo.updateUserPassword(user);
-        await mysql.update(user);
         userId = exists.id;
       } else {
         user.id = this.dynamo.calendar.now();

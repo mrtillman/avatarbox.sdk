@@ -31,13 +31,8 @@ export namespace MySqlService {
       super();
     }
     async save(user: GravatarUser): Promise<void> {
-      this.execute(`INSERT INTO users (id, hash, secret)
-                    VALUES (${user.id}, '${user.emailHash}', '${user.password}')`);
-    }
-    async update(user: GravatarUser): Promise<void> {
-      this.execute(`UPDATE users
-                    SET secret = '${user.password}'
-                    WHERE id = ${user.id}`);
+      this.execute(`INSERT INTO users (id, hash)
+                    VALUES (${user.id}, '${user.emailHash}')`);
     }
     async delete(...ids: string[]) {
       this.execute(`DELETE FROM users
