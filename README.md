@@ -15,27 +15,29 @@
 
 ## Description
 
-**avatarbox.sdk** is a library designed to facilitate the development of application components such as [avatarbox.publisher](https://github.com/mrtillman/avatarbox.publisher) and [avatarbox.worker](https://github.com/mrtillman/avatarbox.worker), however it also supports [avatarbox.app](https://github.com/mrtillman/avatarbox.app) and [avatarbox.api](https://github.com/mrtillman/avatarbox.api).
+**avatarbox.sdk** is a specialized library designed to facilitate the development of internal application components such as [avatarbox.publisher](https://github.com/mrtillman/avatarbox.publisher), [avatarbox.worker](https://github.com/mrtillman/avatarbox.worker), [avatarbox.app](https://github.com/mrtillman/avatarbox.app) and [avatarbox.api](https://github.com/mrtillman/avatarbox.api). Unlike a general-purpose library, **avatarbox.sdk** is tailored for back-end resources situated within the AvatarBox [Virtual Private Clouds (VPCs)](https://aws.amazon.com/vpc/?vpc-blogs.sort-by=item.additionalFields.createdDate&vpc-blogs.sort-order=desc) hosted on [Amazon Web Services (AWS)](https://en.wikipedia.org/wiki/Amazon_Web_Services).
 
 ## Checklist
 
-- EventBridge Pre-Warm Rule <sup>a.</sup>
-- DynamoDB table called `Gravatars` 
-  - set `email` as the partition key
-  - create [Global Secondary Index](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/GSI.html) called `index-id-email`, where `id (Number)` is the partition key, and `email (String)` is the sort key.
+- DynamoDB table: `Gravatars` 
+  - partition key: `email`
+  - [Global Secondary Index](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/GSI.html) 
+    - name: `index-id-email`
+    - partition key: `id (Number)` 
+    - sort key: `email (String)`
 - KMS Symmetric Key
-- MySQL table: [gravatar.users](https://github.com/mrtillman/avatarbox.sdk/blob/master/gravatar.users.sql) <sup>b.</sup>
+- MySQL table: [gravatar.users](https://github.com/mrtillman/avatarbox.sdk/blob/master/gravatar.users.sql) <sup>a.</sup>
 - SQS Queue
 
 *SQS Queue Setup:*
 
 |Setting|Description|
 |---|---|
-|Lambda Triggers|`avbx-worker` <sup>c.</sup>|
+|Lambda Triggers|`avbx-worker` <sup>b.</sup>|
 |Name|`avbx-worker-queue`|
 |Type|Standard|
 
-> a. To avoid [cold start issues](https://github.com/mrtillman/avatarbox.worker/wiki/Resolving-Cold-Start-Issues), set up an EventBridge rule that triggers `avbx-worker` periodically. <br/>b. This table forms part of a [database connection](https://auth0.com/docs/connections/database) that supports the [Auth0 Integration](https://github.com/mrtillman/avatarbox.api/wiki/Auth0-Integration).<br/> c. Use [avatarbox.worker](https://github.com/mrtillman/avatarbox.worker) to define this Lambda function.
+> a. This table establishes a [database connection](https://auth0.com/docs/connections/database) that supports the [Auth0 Integration](https://github.com/mrtillman/avatarbox.api/wiki/Auth0-Integration).<br/> b. Use [avatarbox.worker](https://github.com/mrtillman/avatarbox.worker) to define this Lambda function.
 
 ## Installation
 
@@ -85,7 +87,7 @@ const client = new AvbxGravatarClient();
 |Method|Description|
 |---|---|
 |`login(email,password)`|authenticates a Gravatar user and returns an instance of [GravatarClient](https://github.com/mrtillman/grav.client)|
-|`fetch(id)`|finds a Gravatar user by `id` or `email` and returns an instance of *GravatarClient*|
+|`fetch(id\|email)`|finds a Gravatar user by `id` or `email` and returns an instance of *GravatarClient*|
 |`on(email)`|enable auto updates for a Gravatar user|
 |`off(email)`|disable auto updates for a Gravatar user|
 |`delete(users)`|deletes one or more [GravatarUser](https://github.com/mrtillman/avatarbox.sdk/blob/master/Domain/gravatar-user.ts)s from storage|
