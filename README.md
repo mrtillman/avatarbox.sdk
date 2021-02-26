@@ -60,6 +60,7 @@ MYSQL_PORT=3306
 MYSQL_USER=mrtillman
 MYSQL_PASSWORD=letmein
 MYSQL_DATABASE=gravatar
+SALT={BCRYPT-SALT}
 ```
 
 <!--
