@@ -17,7 +17,6 @@ export namespace UserService {
     }
 
     public async save(user: GravatarUser): Promise<string> {
-      const mysql = new MySqlService.Gravatar();
       user.password = await this.kms.encrypt(user.password);
       const exists = await this.find(user.email);
       let userId = null;
@@ -26,13 +25,14 @@ export namespace UserService {
         await this.dynamo.updateUserPassword(user);
         userId = exists.id;
       } else {
+        const mysql = new MySqlService.Gravatar();
         user.id = this.dynamo.calendar.now();
         await this.dynamo.putUser(user);
         user.emailHash = await this.bcrypt.hash(user.emailHash);
         await mysql.save(user);
         userId = user.id;
+        mysql.end();
       }
-      mysql.end();
       return userId;
     }
     public async find(email: string): Promise<GravatarUser | null> {
