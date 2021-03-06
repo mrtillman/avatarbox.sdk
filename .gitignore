@@ -1,7 +1,5 @@
 _
 
-.travis.yml
-
 # Logs
 logs
 *.log

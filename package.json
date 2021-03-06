@@ -10,7 +10,7 @@
     "test:cov": "nyc -r text -e .ts -x \"**/*.spec.ts\" npm run test",
     "postinstall": "npm run build",
     "format": "prettier --write \"**/*.ts\"",
-    "coverage": "NODE_ENV=test nyc -r text-lcov -e .ts -x \"**/*.spec.ts\" npm run test | coveralls",
+    "coverage": "nyc -r text-lcov -e .ts -x \"./Presentation/**/*.spec.ts\" npm run test | coveralls",
     "snyk-protect": "snyk protect",
     "prepare": "npm run snyk-protect"
   },
@@ -52,7 +52,7 @@
     "@aws-sdk/types": "^3.1.0",
     "@types/bcrypt": "^3.0.0",
     "@types/mysql": "^2.15.17",
-    "coveralls": "^3.0.9",
+    "coveralls": "^3.1.0",
     "jasmine-ts": "^0.3.0",
     "mem": ">=4.0.0",
     "minimatch": ">=3.0.2",
