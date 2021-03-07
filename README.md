@@ -7,6 +7,8 @@
 [![Build Status](https://travis-ci.com/mrtillman/avatarbox.sdk.svg?branch=master)](https://travis-ci.com/mrtillman/avatarbox.sdk)
 [![Coverage Status](https://coveralls.io/repos/github/mrtillman/avatarbox.sdk/badge.svg?branch=master)](https://coveralls.io/github/mrtillman/avatarbox.sdk?branch=master)
 
+[![NPM](https://nodei.co/npm/avatarbox.sdk.png)](https://www.npmjs.com/package/avatarbox.sdk)
+
 ## Description
 
 **avatarbox.sdk** is a specialized library designed to facilitate the development of internal application components such as [avatarbox.publisher](https://github.com/mrtillman/avatarbox.publisher), [avatarbox.worker](https://github.com/mrtillman/avatarbox.worker), [avatarbox.app](https://github.com/mrtillman/avatarbox.app) and [avatarbox.api](https://github.com/mrtillman/avatarbox.api). Unlike a general-purpose library, **avatarbox.sdk** is tailored to back-end resources situated within the AvatarBox [Virtual Private Cloud (VPC)](https://aws.amazon.com/vpc/?vpc-blogs.sort-by=item.additionalFields.createdDate&vpc-blogs.sort-order=desc) hosted on [Amazon Web Services (AWS)](https://en.wikipedia.org/wiki/Amazon_Web_Services).
