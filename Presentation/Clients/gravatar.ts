@@ -5,6 +5,7 @@ import { GravatarIcon } from "../../Domain/gravatar-icon";
 import { S3Service } from "../../Services/s3.service";
 import { UserService } from "../../Services/user.service";
 import { GravatarUser } from "../../Domain/gravatar-user";
+import { container } from '../../Common/container';
 
 export class AvbxGravatarClient {
   public dynamo: DynamoDBService.Gravatar;
@@ -13,10 +14,10 @@ export class AvbxGravatarClient {
   public user: UserService.Gravatar;
 
   constructor() {
-    this.s3 = new S3Service.AvbxIcons();
-    this.dynamo = new DynamoDBService.Gravatar();
-    this.sqs = new SQSService();
-    this.user = new UserService.Gravatar();
+    this.s3 = container.resolve('s3');
+    this.dynamo = container.resolve('dynamo');
+    this.sqs = container.resolve('sqs');
+    this.user = container.resolve('user');
     this.user.dynamo = this.dynamo;
   }
 
