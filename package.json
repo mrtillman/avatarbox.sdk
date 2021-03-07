@@ -1,6 +1,6 @@
 {
   "name": "avatarbox.sdk",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "nodejs sdk for avatarbox.io",
   "main": "Release/Presentation/index.js",
   "types": "Release/Presentation/index.d.ts",
@@ -37,7 +37,6 @@
     "@aws-sdk/client-sqs": "^3.4.1",
     "@types/jasmine": "^3.5.0",
     "@types/jest": "^24.9.0",
-    "@types/node": "^13.1.7",
     "awilix": "^4.3.3",
     "bcrypt": "^5.0.0",
     "dotenv": "^8.2.0",
