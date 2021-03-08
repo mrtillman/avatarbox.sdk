@@ -92,23 +92,26 @@ export namespace DynamoDBService {
     public async findUserById(id: string): Promise<GravatarUser | null> {
       const command = new QueryCommand({
         TableName: this._tableName,
-        IndexName: 'index-id-email',
+        IndexName: "index-id-email",
         ExpressionAttributeValues: {
           ":id": {
-            N: id
-           }
-        }, 
-        KeyConditionExpression: "id = :id"
+            N: id,
+          },
+        },
+        KeyConditionExpression: "id = :id",
       });
       const result = (await this.query(command)) as QueryCommandOutput;
-      if(result.Count == 0) return null;
+      if (result.Count == 0) return null;
       const user = (result.Items && result.Items[0]) as any;
-      return user && {
-        id: user.id.N,
-        email: user.email.S,
-        emailHash: user.email_hash.S,
-        password: user.password.S,
-      } as GravatarUser;
+      return (
+        user &&
+        ({
+          id: user.id.N,
+          email: user.email.S,
+          emailHash: user.email_hash.S,
+          password: user.password.S,
+        } as GravatarUser)
+      );
     }
 
     public async putUser(user: GravatarUser): Promise<void> {
