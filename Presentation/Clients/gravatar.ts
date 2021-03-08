@@ -5,19 +5,20 @@ import { GravatarIcon } from "../../Domain/gravatar-icon";
 import { S3Service } from "../../Services/s3.service";
 import { UserService } from "../../Services/user.service";
 import { GravatarUser } from "../../Domain/gravatar-user";
-import { container } from '../../Common/container';
+import { container } from "../../Common/container";
 
 export class AvbxGravatarClient {
   public dynamo: DynamoDBService.Gravatar;
   public sqs: SQSService;
   public s3: S3Service.AvbxIcons;
   public user: UserService.Gravatar;
+  public client: GravatarClient;
 
   constructor() {
-    this.s3 = container.resolve('s3');
-    this.dynamo = container.resolve('dynamo');
-    this.sqs = container.resolve('sqs');
-    this.user = container.resolve('user');
+    this.s3 = container.resolve("s3");
+    this.dynamo = container.resolve("dynamo");
+    this.sqs = container.resolve("sqs");
+    this.user = container.resolve("user");
     this.user.dynamo = this.dynamo;
   }
 
@@ -25,7 +26,11 @@ export class AvbxGravatarClient {
     email: string,
     password: string
   ): Promise<GravatarClient | null> {
-    const client = new GravatarClient(email, password);
+    if (!this.client) {
+      this.client = new GravatarClient(email, password);
+    }
+
+    const { client } = this;
 
     try {
       await client.test();
@@ -36,7 +41,6 @@ export class AvbxGravatarClient {
       } as GravatarUser);
       await this.s3.putIcon(`${client.gravatarImageUrl}?s=450`, userId);
     } catch (error) {
-      console.error(error);
       return null;
     }
 
