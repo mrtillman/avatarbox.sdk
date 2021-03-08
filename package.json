@@ -1,6 +1,6 @@
 {
   "name": "avatarbox.sdk",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "nodejs sdk for avatarbox.io",
   "main": "Release/Presentation/index.js",
   "types": "Release/Presentation/index.d.ts",
