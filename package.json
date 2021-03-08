@@ -1,6 +1,6 @@
 {
   "name": "avatarbox.sdk",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "nodejs sdk for avatarbox.io",
   "main": "Release/Presentation/index.js",
   "types": "Release/Presentation/index.d.ts",
@@ -35,10 +35,11 @@
     "@aws-sdk/client-kms": "^3.3.0",
     "@aws-sdk/client-s3": "^3.5.0",
     "@aws-sdk/client-sqs": "^3.4.1",
+    "@types/bcryptjs": "^2.4.2",
     "@types/jest": "^24.9.0",
     "@types/node": "^13.1.7",
     "awilix": "^4.3.3",
-    "bcrypt": "^5.0.0",
+    "bcryptjs": "^2.4.3",
     "dotenv": "^8.2.0",
     "expect": "^24.9.0",
     "grav.client": "^2.4.19",
@@ -50,7 +51,6 @@
   },
   "devDependencies": {
     "@aws-sdk/types": "^3.1.0",
-    "@types/bcrypt": "^3.0.0",
     "@types/mysql": "^2.15.18",
     "coveralls": "^3.1.0",
     "mem": ">=4.0.0",
