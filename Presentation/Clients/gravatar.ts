@@ -47,6 +47,13 @@ export class AvbxGravatarClient {
     return client;
   }
 
+  public async isActive(id: string): Promise<Boolean> {
+    const user = isNaN(parseInt(id))
+      ? await this.user.find(id)
+      : await this.user.findById(id);
+    return user ? user.isActive : false;
+  }
+
   public async fetch(id: string): Promise<GravatarClient | null> {
     const user = isNaN(parseInt(id))
       ? await this.user.find(id)
