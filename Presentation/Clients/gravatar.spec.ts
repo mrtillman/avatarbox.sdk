@@ -10,6 +10,9 @@ container.register({
   sqs: awilix.asValue({}),
   user: awilix.asValue({
     save: jest.fn(),
+    find: jest.fn(),
+    findById: jest.fn(),
+    getClient: jest.fn(),
   }),
 });
 const userId = 1;
@@ -27,6 +30,9 @@ describe("AvbxGravatarClient", () => {
   beforeEach(() => {
     avbxClient = new AvbxGravatarClient();
   });
+  afterEach(() => {
+    jest.clearAllMocks();
+  })
   describe("login", () => {
     it("should save user", async () => {
       const save = avbxClient.user.save as jest.Mock;
@@ -64,4 +70,56 @@ describe("AvbxGravatarClient", () => {
       expect(client).toBe(null);
     });
   });
+  describe("isActive", () => {
+    it('should find user by id', async () => {
+      const findById = avbxClient.user.findById as jest.Mock;;
+      
+      await avbxClient.isActive(userId.toString());
+
+      expect(findById.mock.calls.length).toBe(1);
+    })
+    it('should find user by email', async () => {
+      const find = avbxClient.user.find as jest.Mock;;
+      
+      await avbxClient.isActive(email);
+
+      expect(find.mock.calls.length).toBe(1);
+    })
+  })
+  describe("fetch", () => {
+    it('should find user by id', async () => {
+      const findById = avbxClient.user.findById as jest.Mock;;
+      
+      await avbxClient.fetch(userId.toString());
+
+      expect(findById.mock.calls.length).toBe(1);
+    })
+    it('should find user by email', async () => {
+      const find = avbxClient.user.find as jest.Mock;;
+      
+      await avbxClient.fetch(email);
+
+      expect(find.mock.calls.length).toBe(1);
+    })
+    it('should return client', async () => {
+      const getClient = avbxClient.user.getClient as jest.Mock;
+      getClient.mockReturnValue({
+        test: jest.fn()
+      });
+
+      const result = await avbxClient.fetch(email);
+
+      expect(result).toBeDefined();
+    })
+    it('should return null on error', async () => {
+      const getClient = avbxClient.user.getClient as jest.Mock;
+      getClient.mockReturnValue({
+        test: () => { throw "this is a test"; }
+      });
+
+      const result = await avbxClient.fetch(email);
+
+      expect(result).toBeNull();
+    })
+  })
 });

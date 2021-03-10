@@ -62,7 +62,6 @@ export class AvbxGravatarClient {
     try {
       await client.test();
     } catch (error) {
-      console.error(error);
       return null;
     }
     return client;
