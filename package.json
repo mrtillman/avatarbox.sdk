@@ -7,10 +7,10 @@
   "scripts": {
     "build": "tsc",
     "test": "jest",
-    "test:cov": "nyc -r text -e .ts -x \"**/*.spec.ts\" npm run test",
+    "test:cov": "jest --coverage",
     "postinstall": "npm run build",
     "format": "prettier --write \"**/*.ts\"",
-    "coverage": "nyc -r text-lcov -e .ts -x \"./Presentation/**/*.spec.ts\" npm run test | coveralls",
+    "coverage": "jest --coverage && coveralls < coverage/lcov.info",
     "snyk-protect": "snyk protect",
     "prepare": "npm run snyk-protect"
   },
@@ -56,7 +56,6 @@
     "mem": ">=4.0.0",
     "minimatch": ">=3.0.2",
     "minimist": ">=0.2.1",
-    "nyc": "^15.0.0",
     "prettier": "^2.0.4",
     "snyk": "^1.319.0",
     "ts-jest": "^26.5.3",

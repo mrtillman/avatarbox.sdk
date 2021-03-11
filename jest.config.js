@@ -9,8 +9,10 @@ module.exports = {
     "^.+\\.(ts)$": "ts-jest"
   },
   "collectCoverageFrom": [
-    "Common/**/*.ts",
-    "Presentation/**/*.ts",
+    "Common/**/*",
+    "Domain/**/*",
+    "Presentation/**/*",
+    "Services/**/*",
     "!Release/**/*",
     "!node_modules/**/*"
   ],
