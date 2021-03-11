@@ -1,10 +1,12 @@
 import { container } from "../../Common/container";
 import { AvbxGravatarClient } from "./gravatar";
 import * as awilix from "awilix";
+import { GravatarUser } from "../../Domain/gravatar-user";
 
 container.register({
   s3: awilix.asValue({
     putIcon: jest.fn(),
+    deleteIcons: jest.fn(),
   }),
   dynamo: awilix.asValue({}),
   sqs: awilix.asValue({}),
@@ -15,6 +17,7 @@ container.register({
     getClient: jest.fn(),
     on: jest.fn(),
     off: jest.fn(),
+    delete: jest.fn(),
   }),
 });
 const userId = 1;
@@ -127,9 +130,6 @@ describe("AvbxGravatarClient", () => {
   describe("on/off", () => {
     it('should enable auto updates', async () => {
       const on = avbxClient.user.on as jest.Mock;
-      on.mockReturnValue({
-        test: () => { throw "this is a test"; }
-      });
 
       await avbxClient.on(email);
 
@@ -137,13 +137,27 @@ describe("AvbxGravatarClient", () => {
     })
     it('should disable auto updates', async () => {
       const off = avbxClient.user.off as jest.Mock;
-      off.mockReturnValue({
-        test: () => { throw "this is a test"; }
-      });
 
       await avbxClient.off(email);
 
       expect(off.mock.calls.length).toBe(1);
+    })
+  })
+  describe("delete", () => {
+    const users = [{ id: 1 }, { id: 2 }] as any[];
+    it('should delete S3 icons', async () => {
+      const deleteIcons = avbxClient.s3.deleteIcons as jest.Mock;
+
+      await avbxClient.delete(...users)
+
+      expect(deleteIcons.mock.calls[0]).toEqual([1,2]);
+    })
+    it('should delete users', async () => {
+      const deleteUser = avbxClient.user.delete as jest.Mock;
+
+      await avbxClient.delete(...users)
+
+      expect(deleteUser.mock.calls[0]).toEqual(users);
     })
   })
 });
