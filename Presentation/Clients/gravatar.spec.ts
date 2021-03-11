@@ -13,6 +13,8 @@ container.register({
     find: jest.fn(),
     findById: jest.fn(),
     getClient: jest.fn(),
+    on: jest.fn(),
+    off: jest.fn(),
   }),
 });
 const userId = 1;
@@ -120,6 +122,28 @@ describe("AvbxGravatarClient", () => {
       const result = await avbxClient.fetch(email);
 
       expect(result).toBeNull();
+    })
+  })
+  describe("on/off", () => {
+    it('should enable auto updates', async () => {
+      const on = avbxClient.user.on as jest.Mock;
+      on.mockReturnValue({
+        test: () => { throw "this is a test"; }
+      });
+
+      await avbxClient.on(email);
+
+      expect(on.mock.calls.length).toBe(1);
+    })
+    it('should disable auto updates', async () => {
+      const off = avbxClient.user.off as jest.Mock;
+      off.mockReturnValue({
+        test: () => { throw "this is a test"; }
+      });
+
+      await avbxClient.off(email);
+
+      expect(off.mock.calls.length).toBe(1);
     })
   })
 });
