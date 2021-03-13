@@ -8,7 +8,11 @@ container.register({
     putIcon: jest.fn(),
     deleteIcons: jest.fn(),
   }),
-  dynamo: awilix.asValue({}),
+  dynamo: awilix.asValue({
+    collect: jest.fn(),
+    peek: jest.fn(),
+    dig: jest.fn(),
+  }),
   sqs: awilix.asValue({}),
   user: awilix.asValue({
     save: jest.fn(),
@@ -37,6 +41,27 @@ describe("AvbxGravatarClient", () => {
   });
   afterEach(() => {
     jest.clearAllMocks();
+  })
+  it('should collect', async () => {
+    const collect = avbxClient.dynamo.collect as jest.Mock;
+    const result = await collect.mockReturnValue(1);
+    expect(result).toBeDefined();
+  })
+  it('should peek', async () => {
+    const peek = avbxClient.dynamo.peek as jest.Mock;
+    const result = await peek.mockReturnValue(1);
+    expect(result).toBeDefined();
+  })
+  it('should dig 10 days by default', async () => {
+    const dig = avbxClient.dynamo.dig as jest.Mock;
+    await avbxClient.dig();
+    expect(dig.mock.calls[0][0]).toBe(10);
+  })
+  it('should dig \'x\' days', async () => {
+    const days = 3;
+    const dig = avbxClient.dynamo.dig as jest.Mock;
+    await avbxClient.dig(days);
+    expect(dig.mock.calls[0][0]).toBe(days);
   })
   describe("login", () => {
     it("should save user", async () => {
