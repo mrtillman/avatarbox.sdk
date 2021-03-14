@@ -1,7 +1,7 @@
 import { container } from "../../Common/container";
 import { AvbxGravatarClient } from "./gravatar";
 import * as awilix from "awilix";
-import { GravatarUser } from "../../Domain/gravatar-user";
+import { GravatarIcon } from "../../Domain/gravatar-icon";
 
 container.register({
   s3: awilix.asValue({
@@ -12,8 +12,12 @@ container.register({
     collect: jest.fn(),
     peek: jest.fn(),
     dig: jest.fn(),
+    reset: jest.fn(),
+    sweep: jest.fn(),
   }),
-  sqs: awilix.asValue({}),
+  sqs: awilix.asValue({
+    touch: jest.fn(),
+  }),
   user: awilix.asValue({
     save: jest.fn(),
     find: jest.fn(),
@@ -25,6 +29,7 @@ container.register({
   }),
 });
 const userId = 1;
+const imageUrl = "https://www.gravatar.com/avatar/205e460b479e2e5b48aec07710c08d50";
 const email = "user1@example.com";
 const emailHash = "111d68d06e2d317b5a59c2c6c5bad808";
 const password = "letmein";
@@ -52,16 +57,22 @@ describe("AvbxGravatarClient", () => {
     const result = await peek.mockReturnValue(1);
     expect(result).toBeDefined();
   })
-  it('should dig 10 days by default', async () => {
-    const dig = avbxClient.dynamo.dig as jest.Mock;
-    await avbxClient.dig();
-    expect(dig.mock.calls[0][0]).toBe(10);
+  it('should sweep', async () => {
+    const userIds = [1,2];
+    const deleteIcons = avbxClient.s3.deleteIcons as jest.Mock;
+    const sweep = avbxClient.dynamo.sweep as jest.Mock;
+    sweep.mockReturnValue(userIds);
+
+    await avbxClient.sweep();
+    
+    expect(deleteIcons.mock.calls[0]).toEqual(userIds);
   })
-  it('should dig \'x\' days', async () => {
-    const days = 3;
-    const dig = avbxClient.dynamo.dig as jest.Mock;
-    await avbxClient.dig(days);
-    expect(dig.mock.calls[0][0]).toBe(days);
+  it('should touch', async () => {
+    const touch = avbxClient.sqs.touch as jest.Mock;
+
+    await avbxClient.touch(email);
+    
+    expect(touch.mock.calls[0]).toEqual([email]);
   })
   describe("login", () => {
     it("should save user", async () => {
@@ -183,6 +194,43 @@ describe("AvbxGravatarClient", () => {
       await avbxClient.delete(...users)
 
       expect(deleteUser.mock.calls[0]).toEqual(users);
+    })
+  })
+  describe('dig', () => {
+    it('should dig 10 days by default', async () => {
+      const dig = avbxClient.dynamo.dig as jest.Mock;
+      await avbxClient.dig();
+      expect(dig.mock.calls[0][0]).toBe(10);
+    })
+    it('should dig \'x\' days', async () => {
+      const days = 3;
+      const dig = avbxClient.dynamo.dig as jest.Mock;
+      await avbxClient.dig(days);
+      expect(dig.mock.calls[0][0]).toBe(days);
+    })
+  })
+  describe("reset", () => {
+    beforeEach(() => {
+      const find = avbxClient.user.find as jest.Mock;;
+      find.mockReturnValue({id: userId, email});
+    })
+    it('should update S3 icon', async () => {
+      const putIcon = avbxClient.s3.putIcon as jest.Mock;
+
+      await avbxClient.reset({
+        email, imageUrl
+      } as GravatarIcon)
+
+      expect(putIcon.mock.calls[0]).toEqual([imageUrl, userId]);
+    })
+    it('should update timestamp', async () => {
+      const reset = avbxClient.dynamo.reset as jest.Mock;
+
+      await avbxClient.reset({
+        email, imageUrl
+      } as GravatarIcon)
+
+      expect(reset.mock.calls[0]).toEqual([email]);
     })
   })
 });
