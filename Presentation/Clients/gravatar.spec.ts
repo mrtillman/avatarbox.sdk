@@ -49,12 +49,18 @@ describe("AvbxGravatarClient", () => {
   })
   it('should collect', async () => {
     const collect = avbxClient.dynamo.collect as jest.Mock;
-    const result = await collect.mockReturnValue(1);
+    collect.mockReturnValue(1);
+    
+    const result = await avbxClient.collect();
+
     expect(result).toBeDefined();
   })
   it('should peek', async () => {
     const peek = avbxClient.dynamo.peek as jest.Mock;
-    const result = await peek.mockReturnValue(1);
+    peek.mockReturnValue(1);
+    
+    const result = await avbxClient.collect();
+
     expect(result).toBeDefined();
   })
   it('should sweep', async () => {
