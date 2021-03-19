@@ -45,7 +45,7 @@ $ git clone https://github.com/mrtillman/avatarbox.sdk.git
 $ cd avatarbox.sdk && npm install
 ```
 
-Next, find [.env.demo](https://github.com/mrtillman/avatarbox.sdk/blob/master/.env.demo), rename it to `.env` and modify:
+Next, find [demo.env](https://github.com/mrtillman/avatarbox.sdk/blob/master/demo.env), rename it to `.env` and modify:
 
 ```sh
 KMS_KEY_ID={YOUR-KMS-KEY-ID}
