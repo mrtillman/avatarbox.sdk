@@ -84,7 +84,8 @@ export namespace DynamoDBService {
           email: result.Item.email.S,
           emailHash: result.Item.email_hash.S,
           password: result.Item.password.S,
-          isActive: result.Item.is_active.BOOL
+          isActive: result.Item.is_active.BOOL,
+          lastUpdated: new Date(parseInt(result.Item.last_updated.N as string)),
         } as GravatarUser;
       }
       return null;
@@ -111,7 +112,8 @@ export namespace DynamoDBService {
           email: user.email.S,
           emailHash: user.email_hash.S,
           password: user.password.S,
-          isActive: user.is_active.BOOL
+          isActive: user.is_active.BOOL,
+          lastUpdated: new Date(parseInt(user.last_updated.N)),
         } as GravatarUser)
       );
     }

@@ -4,4 +4,5 @@ export interface GravatarUser {
   emailHash: string;
   password: string;
   isActive: boolean;
+  lastUpdated: Date;
 }
