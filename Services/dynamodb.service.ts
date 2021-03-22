@@ -261,9 +261,7 @@ export namespace DynamoDBService {
       return this._imageScan(command);
     }
 
-    public async dig(
-      days: number
-    ): Promise<(AvbxIcon | undefined)[] | null> {
+    public async dig(days: number): Promise<(AvbxIcon | undefined)[] | null> {
       const command = new ScanCommand({
         TableName: this._tableName,
         ScanFilter: {

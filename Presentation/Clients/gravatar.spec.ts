@@ -29,7 +29,8 @@ container.register({
   }),
 });
 const userId = 1;
-const imageUrl = "https://www.gravatar.com/avatar/205e460b479e2e5b48aec07710c08d50";
+const imageUrl =
+  "https://www.gravatar.com/avatar/205e460b479e2e5b48aec07710c08d50";
 const email = "user1@example.com";
 const emailHash = "111d68d06e2d317b5a59c2c6c5bad808";
 const password = "letmein";
@@ -46,40 +47,40 @@ describe("AvbxGravatarClient", () => {
   });
   afterEach(() => {
     jest.clearAllMocks();
-  })
-  it('should collect', async () => {
+  });
+  it("should collect", async () => {
     const collect = avbxClient.dynamo.collect as jest.Mock;
     collect.mockReturnValue(1);
-    
+
     const result = await avbxClient.collect();
 
     expect(result).toBeDefined();
-  })
-  it('should peek', async () => {
+  });
+  it("should peek", async () => {
     const peek = avbxClient.dynamo.peek as jest.Mock;
     peek.mockReturnValue(1);
-    
+
     const result = await avbxClient.collect();
 
     expect(result).toBeDefined();
-  })
-  it('should sweep', async () => {
-    const userIds = [1,2];
+  });
+  it("should sweep", async () => {
+    const userIds = [1, 2];
     const deleteIcons = avbxClient.s3.deleteIcons as jest.Mock;
     const sweep = avbxClient.dynamo.sweep as jest.Mock;
     sweep.mockReturnValue(userIds);
 
     await avbxClient.sweep();
-    
+
     expect(deleteIcons.mock.calls[0]).toEqual(userIds);
-  })
-  it('should touch', async () => {
+  });
+  it("should touch", async () => {
     const touch = avbxClient.sqs.touch as jest.Mock;
 
     await avbxClient.touch(email);
-    
+
     expect(touch.mock.calls[0]).toEqual([email]);
-  })
+  });
   describe("login", () => {
     it("should save user", async () => {
       const save = avbxClient.user.save as jest.Mock;
@@ -118,125 +119,129 @@ describe("AvbxGravatarClient", () => {
     });
   });
   describe("isActive", () => {
-    it('should find user by id', async () => {
-      const findById = avbxClient.user.findById as jest.Mock;;
-      
+    it("should find user by id", async () => {
+      const findById = avbxClient.user.findById as jest.Mock;
+
       await avbxClient.isActive(userId.toString());
 
       expect(findById.mock.calls.length).toBe(1);
-    })
-    it('should find user by email', async () => {
-      const find = avbxClient.user.find as jest.Mock;;
-      
+    });
+    it("should find user by email", async () => {
+      const find = avbxClient.user.find as jest.Mock;
+
       await avbxClient.isActive(email);
 
       expect(find.mock.calls.length).toBe(1);
-    })
-  })
+    });
+  });
   describe("fetch", () => {
-    it('should find user by id', async () => {
-      const findById = avbxClient.user.findById as jest.Mock;;
-      
+    it("should find user by id", async () => {
+      const findById = avbxClient.user.findById as jest.Mock;
+
       await avbxClient.fetch(userId.toString());
 
       expect(findById.mock.calls.length).toBe(1);
-    })
-    it('should find user by email', async () => {
-      const find = avbxClient.user.find as jest.Mock;;
-      
+    });
+    it("should find user by email", async () => {
+      const find = avbxClient.user.find as jest.Mock;
+
       await avbxClient.fetch(email);
 
       expect(find.mock.calls.length).toBe(1);
-    })
-    it('should return client', async () => {
+    });
+    it("should return client", async () => {
       const getClient = avbxClient.user.getClient as jest.Mock;
       getClient.mockReturnValue({
-        test: jest.fn()
+        test: jest.fn(),
       });
 
       const result = await avbxClient.fetch(email);
 
       expect(result).toBeDefined();
-    })
-    it('should return null on error', async () => {
+    });
+    it("should return null on error", async () => {
       const getClient = avbxClient.user.getClient as jest.Mock;
       getClient.mockReturnValue({
-        test: () => { throw "this is a test"; }
+        test: () => {
+          throw "this is a test";
+        },
       });
 
       const result = await avbxClient.fetch(email);
 
       expect(result).toBeNull();
-    })
-  })
+    });
+  });
   describe("on/off", () => {
-    it('should enable auto updates', async () => {
+    it("should enable auto updates", async () => {
       const on = avbxClient.user.on as jest.Mock;
 
       await avbxClient.on(email);
 
       expect(on.mock.calls.length).toBe(1);
-    })
-    it('should disable auto updates', async () => {
+    });
+    it("should disable auto updates", async () => {
       const off = avbxClient.user.off as jest.Mock;
 
       await avbxClient.off(email);
 
       expect(off.mock.calls.length).toBe(1);
-    })
-  })
+    });
+  });
   describe("delete", () => {
     const users = [{ id: 1 }, { id: 2 }] as any[];
-    it('should delete S3 icons', async () => {
+    it("should delete S3 icons", async () => {
       const deleteIcons = avbxClient.s3.deleteIcons as jest.Mock;
 
-      await avbxClient.delete(...users)
+      await avbxClient.delete(...users);
 
-      expect(deleteIcons.mock.calls[0]).toEqual([1,2]);
-    })
-    it('should delete users', async () => {
+      expect(deleteIcons.mock.calls[0]).toEqual([1, 2]);
+    });
+    it("should delete users", async () => {
       const deleteUser = avbxClient.user.delete as jest.Mock;
 
-      await avbxClient.delete(...users)
+      await avbxClient.delete(...users);
 
       expect(deleteUser.mock.calls[0]).toEqual(users);
-    })
-  })
-  describe('dig', () => {
-    it('should dig 10 days by default', async () => {
+    });
+  });
+  describe("dig", () => {
+    it("should dig 10 days by default", async () => {
       const dig = avbxClient.dynamo.dig as jest.Mock;
       await avbxClient.dig();
       expect(dig.mock.calls[0][0]).toBe(10);
-    })
-    it('should dig \'x\' days', async () => {
+    });
+    it("should dig 'x' days", async () => {
       const days = 3;
       const dig = avbxClient.dynamo.dig as jest.Mock;
       await avbxClient.dig(days);
       expect(dig.mock.calls[0][0]).toBe(days);
-    })
-  })
+    });
+  });
   describe("reset", () => {
     beforeEach(() => {
-      const find = avbxClient.user.find as jest.Mock;;
-      find.mockReturnValue({id: userId, email});
-    })
-    it('should update S3 icon', async () => {
+      const find = avbxClient.user.find as jest.Mock;
+      find.mockReturnValue({ id: userId, email });
+    });
+    it("should update S3 icon", async () => {
       const putIcon = avbxClient.s3.putIcon as jest.Mock;
 
       await avbxClient.reset({
-        email, imageUrl
-      } as GravatarIcon)
+        email,
+        imageUrl,
+      } as GravatarIcon);
 
       expect(putIcon.mock.calls[0]).toEqual([imageUrl, userId]);
-    })
-    it('should update timestamp', async () => {
+    });
+    it("should update timestamp", async () => {
       const reset = avbxClient.dynamo.reset as jest.Mock;
 
       await avbxClient.reset({
-        email, imageUrl
-      } as GravatarIcon)
+        email,
+        imageUrl,
+      } as GravatarIcon);
 
       expect(reset.mock.calls[0]).toEqual([email]);
-    })
-  })
+    });
+  });
 });

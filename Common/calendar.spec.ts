@@ -1,27 +1,26 @@
-import { Calendar, DynamoDbCalendar } from './calendar';
+import { Calendar, DynamoDbCalendar } from "./calendar";
 import moment from "moment";
 
-describe('Calendar', () => {
+describe("Calendar", () => {
   let calendar: Calendar;
   beforeEach(() => {
     calendar = new Calendar();
-  })
-  it('should get yesterday as date', () => {
+  });
+  it("should get yesterday as date", () => {
     const today = moment().startOf("minute").toDate();
     const _today = calendar.today();
     expect(_today).toEqual(today);
-  })
-})
+  });
+});
 
-describe('DynamoDbCalendar', () => {
+describe("DynamoDbCalendar", () => {
   let calendar: DynamoDbCalendar;
   beforeEach(() => {
     calendar = new DynamoDbCalendar();
-  })
-  it('should get yesterday as timestamp', () => {
-    const tsToday = moment().startOf("minute").toDate()
-                            .getTime().toString();
+  });
+  it("should get yesterday as timestamp", () => {
+    const tsToday = moment().startOf("minute").toDate().getTime().toString();
     const _tsToday = calendar.today();
     expect(_tsToday).toBe(tsToday);
-  })
-})
+  });
+});
