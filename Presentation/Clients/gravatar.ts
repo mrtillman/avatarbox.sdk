@@ -6,6 +6,7 @@ import { S3Service } from "../../Services/s3.service";
 import { UserService } from "../../Services/user.service";
 import { GravatarUser } from "../../Domain/gravatar-user";
 import { container } from "../../Common/container";
+import { AvbxIcon } from "../../Domain/avbx-icon";
 
 export class AvbxGravatarClient {
   public dynamo: DynamoDBService.Gravatar;
@@ -78,15 +79,15 @@ export class AvbxGravatarClient {
     await this.s3.deleteIcons(...userIds);
     await this.user.delete(...users);
   }
-  public async collect(): Promise<(GravatarIcon | undefined)[] | null> {
+  public async collect(): Promise<(AvbxIcon | undefined)[] | null> {
     return await this.dynamo.collect();
   }
-  public async peek(): Promise<(GravatarIcon | undefined)[] | null> {
+  public async peek(): Promise<(AvbxIcon | undefined)[] | null> {
     return await this.dynamo.peek();
   }
   public async dig(
     days: number = 10
-  ): Promise<(GravatarIcon | undefined)[] | null> {
+  ): Promise<(AvbxIcon | undefined)[] | null> {
     return await this.dynamo.dig(days);
   }
   public async sweep(days: number = 10): Promise<void> {

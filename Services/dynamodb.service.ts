@@ -15,7 +15,7 @@ import {
 } from "@aws-sdk/client-dynamodb";
 import { GravatarUser } from "../Domain/gravatar-user";
 import { DynamoDbCalendar } from "../Common/calendar";
-import { GravatarIcon } from "../Domain/gravatar-icon";
+import { AvbxIcon } from "../Domain/avbx-icon";
 
 export namespace DynamoDBService {
   class DynamoDBServiceBase {
@@ -220,7 +220,7 @@ export namespace DynamoDBService {
       return userIds;
     }
 
-    public async collect(): Promise<(GravatarIcon | undefined)[] | null> {
+    public async collect(): Promise<(AvbxIcon | undefined)[] | null> {
       const command = new ScanCommand({
         TableName: this._tableName,
         ScanFilter: {
@@ -239,16 +239,16 @@ export namespace DynamoDBService {
         return result.Items.map(
           (item) =>
             ({
-              email: item.email.S as string,
-              imageUrl: `https://www.gravatar.com/avatar/${item.email_hash.S}`,
+              id: item.id.N as string,
+              imageUrl: `https://icons.avatarbox.io/u/${item.id.N}`,
               lastUpdated: new Date(parseInt(item.last_updated.N as string)),
-            } as GravatarIcon)
+            } as AvbxIcon)
         );
       }
       return null;
     }
 
-    public async peek(): Promise<(GravatarIcon | undefined)[] | null> {
+    public async peek(): Promise<(AvbxIcon | undefined)[] | null> {
       const command = new ScanCommand({
         TableName: this._tableName,
         ScanFilter: {
@@ -263,7 +263,7 @@ export namespace DynamoDBService {
 
     public async dig(
       days: number
-    ): Promise<(GravatarIcon | undefined)[] | null> {
+    ): Promise<(AvbxIcon | undefined)[] | null> {
       const command = new ScanCommand({
         TableName: this._tableName,
         ScanFilter: {
@@ -335,16 +335,16 @@ export namespace DynamoDBService {
 
     private async _imageScan(
       command: ScanCommand
-    ): Promise<(GravatarIcon | undefined)[] | null> {
+    ): Promise<(AvbxIcon | undefined)[] | null> {
       const result = await this.scan(command);
       if (result.Items && result.Items.length) {
         return result.Items.map(
           (item) =>
             ({
-              email: item.email.S as string,
-              imageUrl: `https://www.gravatar.com/avatar/${item.email_hash.S}`,
+              id: item.id.N as string,
+              imageUrl: `https://icons.avatarbox.io/u/${item.id.N}`,
               lastUpdated: new Date(parseInt(item.last_updated.N as string)),
-            } as GravatarIcon)
+            } as AvbxIcon)
         );
       }
       return null;
