@@ -6,6 +6,8 @@
 
 [![Build Status](https://travis-ci.com/mrtillman/avatarbox.sdk.svg?branch=master)](https://travis-ci.com/mrtillman/avatarbox.sdk)
 [![Coverage Status](https://coveralls.io/repos/github/mrtillman/avatarbox.sdk/badge.svg?branch=master)](https://coveralls.io/github/mrtillman/avatarbox.sdk?branch=master)
+[![GitHub tag (latest SemVer)](https://img.shields.io/github/v/tag/mrtillman/avatarbox.sdk?sort=semver)](https://github.com/mrtillman/avatarbox.sdk/releases/tag/1.0.0)
+[![license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/mrtillman/avatarbox.sdk/blob/master/LICENSE)
 
 [![NPM](https://nodei.co/npm/avatarbox.sdk.png)](https://www.npmjs.com/package/avatarbox.sdk)
 
@@ -92,7 +94,7 @@ const client = new AvbxGravatarClient();
 |`collect()`|returns a list of all icons in the [Ready State](https://github.com/mrtillman/avatarbox.sdk/wiki/Glossary#ready-state)|
 |`peek()`|returns a list of all icons in the [Fresh State](https://github.com/mrtillman/avatarbox.sdk/wiki/Glossary#fresh-state)|
 |`dig()`|returns a list of all icons in the [Cold State](https://github.com/mrtillman/avatarbox.sdk/wiki/Glossary#cold-state)|
-|`sweep()`|removes all icons in the *Cold State*|
+|`sweep()`|deletes all *GravatarUsers* in the *Cold State*|
 |`touch(id\|email)`|sends an SQS message to [avatarbox.worker](https://github.com/mrtillman/avatarbox.worker)|
 |`reset(icon)`|resets the timestamp indicating when the [GravatarIcon](https://github.com/mrtillman/avatarbox.sdk/blob/master/Domain/gravatar-icon.ts) was last updated |
 
