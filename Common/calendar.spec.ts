@@ -26,15 +26,14 @@ describe("Calendar", () => {
   });
   it("should compute preceding hour as date", () => {
     const hours = 1;
-    const now = new Date();
-    const earlierToday = calendar.hoursAgo(hours);
-    expect(earlierToday.getHours()).toBe(now.getHours() - hours);
+    const earlier = calendar.hoursAgo(hours);
+    expect(earlier.getHours()).toBe(moment().subtract(hours, "hours").toDate().getHours());
   });
   it("should compute preceding day as date", () => {
     const days = 1;
     const now = new Date();
-    const tsEarlierToday = calendar.daysAgo(days);
-    expect(tsEarlierToday.getDate()).toBe(now.getDate() - days);
+    const earlier = calendar.daysAgo(days);
+    expect(earlier.getDate()).toEqual(now.getDate() - days);
   });
 });
 
@@ -64,14 +63,13 @@ describe("DynamoDbCalendar", () => {
   });
   it("should compute preceding hour as timestamp", () => {
     const hours = 1;
-    const now = new Date();
-    const tsEarlierToday = calendar.hoursAgo(hours);
-    expect((new Date(Number(tsEarlierToday))).getHours()).toBe(now.getHours() - hours);
+    const tsEarlier = calendar.hoursAgo(hours);
+    expect((new Date(Number(tsEarlier))).getHours()).toBe(moment().subtract(hours, "hours").toDate().getHours());
   });
   it("should compute preceding day as timestamp", () => {
     const days = 1;
     const now = new Date();
-    const tsEarlierToday = calendar.daysAgo(days);
-    expect((new Date(Number(tsEarlierToday))).getDate()).toBe(now.getDate() - days);
+    const tsEarlier = calendar.daysAgo(days);
+    expect((new Date(Number(tsEarlier))).getDate()).toBe(now.getDate() - days);
   });
 });
