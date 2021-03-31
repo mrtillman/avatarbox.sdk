@@ -37,19 +37,19 @@
     "@aws-sdk/client-sqs": "^3.4.1",
     "@types/bcryptjs": "^2.4.2",
     "@types/jest": "^24.9.0",
-    "@types/node": "^13.1.7",
     "@types/mysql": "^2.15.18",
+    "@types/node": "^13.1.7",
     "awilix": "^4.3.3",
     "bcryptjs": "^2.4.3",
     "dotenv": "^8.2.0",
     "expect": "^24.9.0",
-    "grav.client": "^2.4.19",
+    "grav.client": "^2.4.21",
     "jest": "^26.6.3",
     "moment": "^2.29.1",
     "mysql": "^2.18.1",
+    "netmask": ">=2.0.1",
     "nock": "^11.7.2",
-    "typescript": "^4.1.3",
-    "netmask": ">=2.0.1"
+    "typescript": "^4.1.3"
   },
   "devDependencies": {
     "@aws-sdk/types": "^3.1.0",
