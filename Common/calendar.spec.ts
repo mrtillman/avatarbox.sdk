@@ -33,9 +33,9 @@ describe("Calendar", () => {
   });
   it("should compute preceding day as date", () => {
     const days = 1;
-    const now = new Date();
+    const _earlier = moment().subtract(1, 'days');
     const earlier = calendar.daysAgo(days);
-    expect(earlier.getDate()).toEqual(now.getDate() - days);
+    expect(earlier.getDate()).toEqual(_earlier.toDate().getDate());
   });
 });
 
@@ -73,8 +73,8 @@ describe("DynamoDbCalendar", () => {
   });
   it("should compute preceding day as timestamp", () => {
     const days = 1;
-    const now = new Date();
+    const _tsEarlier = moment().subtract(1, 'days').toDate();
     const tsEarlier = calendar.daysAgo(days);
-    expect(new Date(Number(tsEarlier)).getDate()).toBe(now.getDate() - days);
+    expect(new Date(Number(tsEarlier)).getDate()).toBe(_tsEarlier.getDate());
   });
 });
