@@ -94,8 +94,8 @@ export class AvbxGravatarClient {
     const userIds = await this.dynamo.sweep(days);
     await this.s3.deleteIcons(...userIds);
   }
-  public touch(email: string): Promise<any> {
-    return this.sqs.touch(email);
+  public touch(...email: string[]): Promise<any> {
+    return this.sqs.touch(...email);
   }
   public async reset(icon: GravatarIcon): Promise<void> {
     const user = (await this.user.find(icon.email)) as GravatarUser;

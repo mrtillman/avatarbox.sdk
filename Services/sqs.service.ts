@@ -1,4 +1,4 @@
-import { SQSClient, SendMessageCommand } from "@aws-sdk/client-sqs";
+import { SQSClient, SendMessageBatchCommand } from "@aws-sdk/client-sqs";
 
 export class SQSService {
   client: SQSClient;
@@ -8,9 +8,13 @@ export class SQSService {
     });
   }
 
-  touch(email: string): Promise<any> {
-    const command = new SendMessageCommand({
-      MessageBody: email,
+  touch(...emails: string[]): Promise<any> {
+    console.log(emails)
+    const command = new SendMessageBatchCommand({
+      Entries: emails.map((email, id) => ({
+        Id: id,
+        MessageBody: email,
+      } as any)),
       QueueUrl: process.env.QUEUE_URL,
     });
     return this.client.send(command);
