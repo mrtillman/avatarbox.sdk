@@ -9,7 +9,6 @@ export class SQSService {
   }
 
   touch(...emails: string[]): Promise<any> {
-    console.log(emails)
     const command = new SendMessageBatchCommand({
       Entries: emails.map((email, id) => ({
         Id: id,
