@@ -242,6 +242,7 @@ export namespace DynamoDBService {
               id: item.id.N as string,
               imageUrl: `https://icons.avatarbox.io/u/${item.id.N}`,
               lastUpdated: new Date(parseInt(item.last_updated.N as string)),
+              isActive: item.is_active.BOOL
             } as AvbxIcon)
         );
       }
@@ -342,6 +343,7 @@ export namespace DynamoDBService {
               id: item.id.N as string,
               imageUrl: `https://icons.avatarbox.io/u/${item.id.N}`,
               lastUpdated: new Date(parseInt(item.last_updated.N as string)),
+              isActive: item.is_active.BOOL
             } as AvbxIcon)
         );
       }
