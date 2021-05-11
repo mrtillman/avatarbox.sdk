@@ -4,6 +4,11 @@ import { DynamoDBService } from "./dynamodb.service";
 import { GravatarClient } from "grav.client";
 import { MySqlService } from "../Services/mysql.service";
 import { BcryptService } from "./bcrypt.service";
+import { TwitterProfile } from "../Domain/twitter-profile";
+import { container } from "../Common/container";
+
+// TODO: put services in own files; 
+//       fix all references + breaking changes 
 
 export namespace UserService {
   export class Gravatar {
@@ -66,6 +71,19 @@ export namespace UserService {
       }
 
       mysql.end();
+    }
+  }
+
+  export class Twitter {
+    public dynamo: DynamoDBService.Twitter;
+    
+    constructor() {
+      this.dynamo = container.resolve("dynamoTwitter");
+    }
+
+    async save(profile: TwitterProfile){
+      await this.dynamo.putUser(profile);
+      return profile.id;
     }
   }
 }

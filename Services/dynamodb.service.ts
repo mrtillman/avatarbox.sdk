@@ -16,12 +16,16 @@ import {
 import { GravatarUser } from "../Domain/gravatar-user";
 import { DynamoDbCalendar } from "../Common/calendar";
 import { AvbxIcon } from "../Domain/avbx-icon";
+import { TwitterProfile } from "../Domain/twitter-profile";
+
+// TODO: put services in own files; 
+//       fix all references + breaking changes 
 
 export namespace DynamoDBService {
   class DynamoDBServiceBase {
     public calendar: DynamoDbCalendar;
     public client: DynamoDBClient;
-
+    protected _tableName: string;
     private _region: string;
 
     constructor() {
@@ -61,7 +65,6 @@ export namespace DynamoDBService {
   }
 
   export class Gravatar extends DynamoDBServiceBase {
-    private _tableName: string;
 
     constructor() {
       super();
@@ -349,5 +352,45 @@ export namespace DynamoDBService {
       }
       return null;
     }
+  }
+
+  export class Twitter extends DynamoDBServiceBase {
+    constructor() {
+      super();
+      this._tableName = "TwitterProfiles";
+    }
+    async putUser(profile: TwitterProfile): Promise<void> {
+      const command = new PutItemCommand({
+        TableName: this._tableName,
+        Item: {
+          id: {
+            N: profile.id,
+          },
+          username: {
+            S: profile.username,
+          },
+          token: {
+            S: profile.token,
+          },
+          token_secret: {
+            S: profile.tokenSecret,
+          },
+          current_avatar_index: {
+            N: "0",
+          },
+          avatars: {
+            SS: profile.avatars
+          },
+          last_updated: {
+            N: this.calendar.yesterday(),
+          },
+          is_active: {
+            BOOL: false,
+          },
+        },
+      });
+      const result = await this.put(command);
+      console.info(result);
+    }    
   }
 }
