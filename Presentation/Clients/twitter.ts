@@ -14,9 +14,13 @@ export class AvbxTwitterClient {
   }
 
   async sync(twitterProfile: TwitterProfile): Promise<void> {
-    // TODO: if Twitter user exists update username, token, tokenSecret
-    //       otherwise, save
-    await this.user.save(twitterProfile);
+    const profile = await this.user.find(twitterProfile.id);
+    if (profile) {
+      // TODO: update username, token, tokenSecret
+      console.log(profile);
+    } else {
+      await this.user.save(twitterProfile);
+    }
   }
 
   on() {}
