@@ -1,14 +1,22 @@
+import { config } from "dotenv";
+
+config();
+
 import { container } from "../../Common/container";
 import { AvbxGravatarClient } from "./gravatar";
 import * as awilix from "awilix";
 import { GravatarIcon } from "../../Domain/gravatar-icon";
 
 container.register({
+  kms: awilix.asValue({
+    encrypt: jest.fn(),
+    decrypt: jest.fn(),
+  }),
   s3: awilix.asValue({
     putIcon: jest.fn(),
     deleteIcons: jest.fn(),
   }),
-  dynamo: awilix.asValue({
+  gravatarRepo: awilix.asValue({
     collect: jest.fn(),
     peek: jest.fn(),
     dig: jest.fn(),
@@ -18,7 +26,7 @@ container.register({
   sqs: awilix.asValue({
     touch: jest.fn(),
   }),
-  user: awilix.asValue({
+  gravatarUserService: awilix.asValue({
     save: jest.fn(),
     find: jest.fn(),
     findById: jest.fn(),
@@ -49,7 +57,7 @@ describe("AvbxGravatarClient", () => {
     jest.clearAllMocks();
   });
   it("should collect", async () => {
-    const collect = avbxClient.dynamo.collect as jest.Mock;
+    const collect = avbxClient.repo.collect as jest.Mock;
     collect.mockReturnValue(1);
 
     const result = await avbxClient.collect();
@@ -57,7 +65,7 @@ describe("AvbxGravatarClient", () => {
     expect(result).toBeDefined();
   });
   it("should peek", async () => {
-    const peek = avbxClient.dynamo.peek as jest.Mock;
+    const peek = avbxClient.repo.peek as jest.Mock;
     peek.mockReturnValue(1);
 
     const result = await avbxClient.collect();
@@ -67,7 +75,7 @@ describe("AvbxGravatarClient", () => {
   it("should sweep", async () => {
     const userIds = [1, 2];
     const deleteIcons = avbxClient.s3.deleteIcons as jest.Mock;
-    const sweep = avbxClient.dynamo.sweep as jest.Mock;
+    const sweep = avbxClient.repo.sweep as jest.Mock;
     sweep.mockReturnValue(userIds);
 
     await avbxClient.sweep();
@@ -207,13 +215,13 @@ describe("AvbxGravatarClient", () => {
   });
   describe("dig", () => {
     it("should dig 10 days by default", async () => {
-      const dig = avbxClient.dynamo.dig as jest.Mock;
+      const dig = avbxClient.repo.dig as jest.Mock;
       await avbxClient.dig();
       expect(dig.mock.calls[0][0]).toBe(10);
     });
     it("should dig 'x' days", async () => {
       const days = 3;
-      const dig = avbxClient.dynamo.dig as jest.Mock;
+      const dig = avbxClient.repo.dig as jest.Mock;
       await avbxClient.dig(days);
       expect(dig.mock.calls[0][0]).toBe(days);
     });
@@ -234,7 +242,7 @@ describe("AvbxGravatarClient", () => {
       expect(putIcon.mock.calls[0]).toEqual([imageUrl, userId]);
     });
     it("should update timestamp", async () => {
-      const reset = avbxClient.dynamo.reset as jest.Mock;
+      const reset = avbxClient.repo.reset as jest.Mock;
 
       await avbxClient.reset({
         email,
