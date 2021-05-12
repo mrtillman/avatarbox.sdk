@@ -9,8 +9,12 @@ export class TwitterUserService {
     this.repo = container.resolve("twitterRepo");
   }
 
-  async save(profile: TwitterProfile) {
+  async save(profile: TwitterProfile): Promise<string> {
     await this.repo.putUser(profile);
     return profile.id;
+  }
+
+  async find(id: string): Promise<TwitterProfile | null> {
+    return await this.repo.findUser(id);
   }
 }
