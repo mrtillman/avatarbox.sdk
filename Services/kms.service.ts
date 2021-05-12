@@ -8,7 +8,7 @@ export class KMSService {
   constructor(keyId: string) {
     this._keyId = keyId;
     this.kmsClient = new KMSClient({
-      region: process.env.REGION,
+      region: process.env.REGION || "us-east-1",
     });
   }
 

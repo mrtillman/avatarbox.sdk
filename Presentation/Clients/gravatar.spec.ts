@@ -1,7 +1,3 @@
-import { config } from "dotenv";
-
-config();
-
 import { container } from "../../Common/container";
 import { AvbxGravatarClient } from "./gravatar";
 import * as awilix from "awilix";
