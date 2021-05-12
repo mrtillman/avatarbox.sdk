@@ -1,26 +1,25 @@
 import { GravatarClient } from "grav.client";
-import { DynamoDBService } from "../../Services/dynamodb.service";
 import { SQSService } from "../../Services/sqs.service";
 import { GravatarIcon } from "../../Domain/gravatar-icon";
 import { S3Service } from "../../Services/s3.service";
-import { UserService } from "../../Services/user.service";
 import { GravatarUser } from "../../Domain/gravatar-user";
 import { container } from "../../Common/container";
 import { AvbxIcon } from "../../Domain/avbx-icon";
+import { GravatarRepository } from "../../Infrastructure/gravatar.repository";
+import { GravatarUserService } from "../../Services/gravatar-user.service";
 
 export class AvbxGravatarClient {
-  public dynamo: DynamoDBService.Gravatar;
+  public repo: GravatarRepository;
   public sqs: SQSService;
   public s3: S3Service.AvbxIcons;
-  public user: UserService.Gravatar;
+  public user: GravatarUserService;
   public client: GravatarClient;
 
   constructor() {
     this.s3 = container.resolve("s3");
-    this.dynamo = container.resolve("dynamo");
     this.sqs = container.resolve("sqs");
-    this.user = container.resolve("user");
-    this.user.dynamo = this.dynamo;
+    this.repo = container.resolve("gravatarRepo");
+    this.user = container.resolve("gravatarUserService");
   }
 
   public async login(
@@ -80,18 +79,18 @@ export class AvbxGravatarClient {
     await this.user.delete(...users);
   }
   public async collect(): Promise<(AvbxIcon | undefined)[] | null> {
-    return await this.dynamo.collect();
+    return await this.repo.collect();
   }
   public async peek(): Promise<(AvbxIcon | undefined)[] | null> {
-    return await this.dynamo.peek();
+    return await this.repo.peek();
   }
   public async dig(
     days: number = 10
   ): Promise<(AvbxIcon | undefined)[] | null> {
-    return await this.dynamo.dig(days);
+    return await this.repo.dig(days);
   }
   public async sweep(days: number = 10): Promise<void> {
-    const userIds = await this.dynamo.sweep(days);
+    const userIds = await this.repo.sweep(days);
     await this.s3.deleteIcons(...userIds);
   }
   public touch(...email: string[]): Promise<any> {
@@ -100,6 +99,6 @@ export class AvbxGravatarClient {
   public async reset(icon: GravatarIcon): Promise<void> {
     const user = (await this.user.find(icon.email)) as GravatarUser;
     await this.s3.putIcon(icon.imageUrl, user.id);
-    await this.dynamo.reset(user.email);
+    await this.repo.reset(user.email);
   }
 }

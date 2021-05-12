@@ -1,22 +1,22 @@
 import { container } from '../../Common/container';
 import { TwitterProfile } from '../../Domain/twitter-profile';
-import { UserService } from '../../Services/user.service';
+import { TwitterUserService } from '../../Services/twitter-user.service';
 
 export class AvbxTwitterClient {
-  private _user: UserService.Twitter;
-  private _token:string;
-  private _tokenSecret:string;
+  public user: TwitterUserService;
+  public token:string;
+  public tokenSecret:string;
 
   constructor(token:string, tokenSecret:string){
-    this._token = token;
-    this._tokenSecret = tokenSecret;
-    this._user = container.resolve("userTwitter");
+    this.token = token;
+    this.tokenSecret = tokenSecret;
+    this.user = container.resolve("twitterUserService");
   }
 
   async sync(twitterProfile: TwitterProfile): Promise<void> {
     // TODO: if Twitter user exists update username, token, tokenSecret
     //       otherwise, save
-    await this._user.save(twitterProfile);
+    await this.user.save(twitterProfile);
   }
 
   on(){
