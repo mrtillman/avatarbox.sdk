@@ -1,5 +1,7 @@
 use gravatar;
 
+-- https://github.com/mrtillman/avatarbox.api/wiki/Auth0-Integration#authentication
+
 CREATE TABLE `users` (
   `id` bigint NOT NULL,
   `hash` varchar(100) DEFAULT NULL,
