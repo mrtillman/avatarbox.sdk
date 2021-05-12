@@ -1,10 +1,20 @@
-import { BatchWriteItemCommand, DeleteItemCommand, GetItemCommand, GetItemCommandOutput, PutItemCommand, QueryCommand, QueryCommandOutput, ScanCommand, ServiceOutputTypes, UpdateItemCommand } from "@aws-sdk/client-dynamodb";
+import {
+  BatchWriteItemCommand,
+  DeleteItemCommand,
+  GetItemCommand,
+  GetItemCommandOutput,
+  PutItemCommand,
+  QueryCommand,
+  QueryCommandOutput,
+  ScanCommand,
+  ServiceOutputTypes,
+  UpdateItemCommand,
+} from "@aws-sdk/client-dynamodb";
 import { AvbxIcon } from "../Domain/avbx-icon";
 import { GravatarUser } from "../Domain/gravatar-user";
 import { DynamoDBService } from "../Services/dynamodb.service";
 
 export class GravatarRepository extends DynamoDBService {
-
   constructor() {
     super();
     this._tableName = "Gravatars";
@@ -184,7 +194,7 @@ export class GravatarRepository extends DynamoDBService {
             id: item.id.N as string,
             imageUrl: `https://icons.avatarbox.io/u/${item.id.N}`,
             lastUpdated: new Date(parseInt(item.last_updated.N as string)),
-            isActive: item.is_active.BOOL
+            isActive: item.is_active.BOOL,
           } as AvbxIcon)
       );
     }
@@ -226,7 +236,7 @@ export class GravatarRepository extends DynamoDBService {
     const result = await this._toggleUser(email, false);
     console.info(result);
   }
-  
+
   public async reset(email: string): Promise<void> {
     const today = this.calendar.today();
     const command = new UpdateItemCommand({
@@ -285,7 +295,7 @@ export class GravatarRepository extends DynamoDBService {
             id: item.id.N as string,
             imageUrl: `https://icons.avatarbox.io/u/${item.id.N}`,
             lastUpdated: new Date(parseInt(item.last_updated.N as string)),
-            isActive: item.is_active.BOOL
+            isActive: item.is_active.BOOL,
           } as AvbxIcon)
       );
     }

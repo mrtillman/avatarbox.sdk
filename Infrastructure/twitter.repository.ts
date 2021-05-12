@@ -3,7 +3,6 @@ import { TwitterProfile } from "../Domain/twitter-profile";
 import { DynamoDBService } from "../Services/dynamodb.service";
 
 export class TwitterRepository extends DynamoDBService {
-  
   constructor() {
     super();
     this._tableName = "TwitterProfiles";
@@ -29,7 +28,7 @@ export class TwitterRepository extends DynamoDBService {
           N: "0",
         },
         avatars: {
-          SS: profile.avatars
+          SS: profile.avatars,
         },
         last_updated: {
           N: this.calendar.yesterday(),
@@ -41,5 +40,5 @@ export class TwitterRepository extends DynamoDBService {
     });
     const result = await this.put(command);
     console.info(result);
-  }    
+  }
 }

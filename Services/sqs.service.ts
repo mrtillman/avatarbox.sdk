@@ -10,10 +10,13 @@ export class SQSService {
 
   touch(...emails: string[]): Promise<any> {
     const command = new SendMessageBatchCommand({
-      Entries: emails.map((email, id) => ({
-        Id: id,
-        MessageBody: email,
-      } as any)),
+      Entries: emails.map(
+        (email, id) =>
+          ({
+            Id: id,
+            MessageBody: email,
+          } as any)
+      ),
       QueueUrl: process.env.QUEUE_URL,
     });
     return this.client.send(command);

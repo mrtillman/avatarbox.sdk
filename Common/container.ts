@@ -14,7 +14,7 @@ container.register({
   s3: awilix.asClass(S3Service.AvbxIcons),
   sqs: awilix.asClass(SQSService),
   bcrypt: awilix.asClass(BcryptService),
-  gravatarRepo: awilix.asClass(GravatarRepository),  
+  gravatarRepo: awilix.asClass(GravatarRepository),
   gravatarUserService: awilix.asClass(GravatarUserService),
   twitterRepo: awilix.asClass(TwitterRepository),
   twitterUserService: awilix.asClass(TwitterUserService),

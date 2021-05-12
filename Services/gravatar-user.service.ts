@@ -12,7 +12,7 @@ export class GravatarUserService {
   public bcrypt: BcryptService;
 
   constructor() {
-    this.kms = container.resolve("kms")
+    this.kms = container.resolve("kms");
     this.repo = container.resolve("gravatarRepo");
     this.bcrypt = container.resolve("bcrypt");
   }

@@ -1,13 +1,13 @@
-import { container } from '../../Common/container';
-import { TwitterProfile } from '../../Domain/twitter-profile';
-import { TwitterUserService } from '../../Services/twitter-user.service';
+import { container } from "../../Common/container";
+import { TwitterProfile } from "../../Domain/twitter-profile";
+import { TwitterUserService } from "../../Services/twitter-user.service";
 
 export class AvbxTwitterClient {
   public user: TwitterUserService;
-  public token:string;
-  public tokenSecret:string;
+  public token: string;
+  public tokenSecret: string;
 
-  constructor(token:string, tokenSecret:string){
+  constructor(token: string, tokenSecret: string) {
     this.token = token;
     this.tokenSecret = tokenSecret;
     this.user = container.resolve("twitterUserService");
@@ -19,29 +19,17 @@ export class AvbxTwitterClient {
     await this.user.save(twitterProfile);
   }
 
-  on(){
+  on() {}
 
-  }
+  off() {}
 
-  off(){
+  addImageFile(imagePath: string) {}
 
-  }
-  
-  addImageFile(imagePath:string){
-    
-  }
-  
-  addImageData(blob:string){
+  addImageData(blob: string) {}
 
-  }
-  
-  removeImage(id:string){
+  removeImage(id: string) {}
 
-  }
-
-  touch(id:string){
-    
-  }
+  touch(id: string) {}
 
   // delete, collect, peek, dig, sweep reset
 }
