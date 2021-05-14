@@ -48,6 +48,36 @@ export class TwitterRepository extends DynamoDBService {
     console.info(result);
   }
 
+  async updateUser(profile: TwitterProfile): Promise<void> {
+    const command = new UpdateItemCommand({
+      TableName: this._tableName,
+      Key: {
+        id: {
+          N: profile.id,
+        },
+      },
+      ExpressionAttributeNames: {
+        "#U": "username",
+        "#T": "token",
+        "#TS": "token_secret",
+      },
+      ExpressionAttributeValues: {
+        ":u": {
+          S: profile.username,
+        },
+        ":t": {
+          S: profile.token,
+        },
+        ":ts": {
+          S: profile.tokenSecret,
+        },
+      },
+      UpdateExpression: "SET #U = :u, #T = :t, #TS = :ts",
+    });
+    const result = await this.update(command);
+    console.info(result);
+  }
+
   async findUser(id: string): Promise<TwitterProfile | null> {
     const command = new GetItemCommand({
       TableName: this._tableName,

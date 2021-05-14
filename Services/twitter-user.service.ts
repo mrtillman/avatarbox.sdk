@@ -14,6 +14,10 @@ export class TwitterUserService {
     return profile.id;
   }
 
+  async update(profile: TwitterProfile): Promise<void> {
+    await this.repo.updateUser(profile);
+  }
+
   async find(id: string): Promise<TwitterProfile | null> {
     return await this.repo.findUser(id);
   }

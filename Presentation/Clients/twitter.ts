@@ -19,8 +19,7 @@ export class AvbxTwitterClient implements AvbxClient {
   async sync(twitterProfile: TwitterProfile): Promise<void> {
     const profile = await this.user.find(twitterProfile.id);
     if (profile) {
-      // TODO: update username, token, tokenSecret
-      console.log(profile);
+      await this.user.update(twitterProfile);
     } else {
       await this.user.save(twitterProfile);
     }
