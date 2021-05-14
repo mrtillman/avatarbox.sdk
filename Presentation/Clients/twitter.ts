@@ -1,19 +1,21 @@
 import { container } from "../../Common/container";
 import { AvbxClient } from "../../Domain/avbx-client";
 import { AvbxIcons } from "../../Domain/avbx-icon";
-import { AvbxUser } from "../../Domain/avbx-user";
 import { TwitterProfile } from "../../Domain/twitter-profile";
+import { S3Service } from "../../Services/s3.service";
 import { TwitterUserService } from "../../Services/twitter-user.service";
 
 export class AvbxTwitterClient implements AvbxClient {
   public user: TwitterUserService;
   public token: string;
   public tokenSecret: string;
+  public s3: S3Service.AvbxIcons;
 
   constructor(token: string, tokenSecret: string) {
     this.token = token;
     this.tokenSecret = tokenSecret;
     this.user = container.resolve("twitterUserService");
+    this.s3 = container.resolve("s3");
   }
 
   async sync(twitterProfile: TwitterProfile): Promise<void> {
@@ -38,8 +40,10 @@ export class AvbxTwitterClient implements AvbxClient {
   async off(id: string): Promise<void> {
     return await this.user.off(id);
   }
-  delete(...users: AvbxUser[]): Promise<void> {
-    throw new Error("Method not implemented.");
+  async delete(...profiles: TwitterProfile[]): Promise<void> {
+    const profileIds = profiles.map((user) => user.id);
+    await this.s3.deleteIcons(...profileIds);
+    await this.user.delete(...profiles);
   }
   collect(): Promise<AvbxIcons> {
     throw new Error("Method not implemented.");

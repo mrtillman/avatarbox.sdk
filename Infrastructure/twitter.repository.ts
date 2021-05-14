@@ -1,4 +1,6 @@
 import {
+  BatchWriteItemCommand,
+  DeleteItemCommand,
   GetItemCommand,
   GetItemCommandOutput,
   PutItemCommand,
@@ -110,6 +112,35 @@ export class TwitterRepository extends DynamoDBService {
 
   public async deactivateUser(id: string): Promise<void> {
     const result = await this._toggleUser(id, false);
+    console.info(result);
+  }
+
+  public async deleteUser(id: string): Promise<void> {
+    const command = new DeleteItemCommand({
+      TableName: this._tableName,
+      Key: {
+        id: {
+          S: id,
+        },
+      },
+    });
+    const result = await this.delete(command);
+    console.info(result);
+  }
+
+  public async deleteUsers(ids: string[]): Promise<void> {
+    if (!ids.length) return;
+    const batchWriteInput = {
+      RequestItems: {
+        [this._tableName]: ids.map((id) => ({
+          DeleteRequest: {
+            Key: { id: { N: id } },
+          },
+        })),
+      },
+    };
+    const batchCommand = new BatchWriteItemCommand(batchWriteInput);
+    const result = await this.batchWrite(batchCommand);
     console.info(result);
   }
 

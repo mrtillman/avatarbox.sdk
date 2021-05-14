@@ -28,4 +28,12 @@ export class TwitterUserService {
   public async off(id: string): Promise<void> {
     await this.repo.deactivateUser(id);
   }
+  public async delete(...profiles: TwitterProfile[]): Promise<void> {
+    if (profiles.length == 1) {
+      const profile = profiles[0];
+      return await this.repo.deleteUser(profile.id);
+    }
+    const ids = profiles.map((profile) => profile.id);
+    return await this.repo.deleteUsers(ids);
+  }
 }
