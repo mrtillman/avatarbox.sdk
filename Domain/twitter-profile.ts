@@ -3,8 +3,8 @@ export interface TwitterProfile {
   username: string;
   token: string;
   tokenSecret: string;
-  isActive: boolean;
+  isActive: Boolean;
   lastUpdated: Date;
   avatars: string[];
-  currentAvatarIndex: number;
+  currentAvatarIndex: Number;
 }
