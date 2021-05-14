@@ -4,11 +4,12 @@ import { GravatarIcon } from "../../Domain/gravatar-icon";
 import { S3Service } from "../../Services/s3.service";
 import { GravatarUser } from "../../Domain/gravatar-user";
 import { container } from "../../Common/container";
-import { AvbxIcon } from "../../Domain/avbx-icon";
+import { AvbxIcons } from "../../Domain/avbx-icon";
 import { GravatarRepository } from "../../Infrastructure/gravatar.repository";
 import { GravatarUserService } from "../../Services/gravatar-user.service";
+import { AvbxClient } from "../../Domain/avbx-client";
 
-export class AvbxGravatarClient {
+export class AvbxGravatarClient implements AvbxClient {
   public repo: GravatarRepository;
   public sqs: SQSService;
   public s3: S3Service.AvbxIcons;
@@ -78,15 +79,13 @@ export class AvbxGravatarClient {
     await this.s3.deleteIcons(...userIds);
     await this.user.delete(...users);
   }
-  public async collect(): Promise<(AvbxIcon | undefined)[] | null> {
+  public async collect(): Promise<AvbxIcons> {
     return await this.repo.collect();
   }
-  public async peek(): Promise<(AvbxIcon | undefined)[] | null> {
+  public async peek(): Promise<AvbxIcons> {
     return await this.repo.peek();
   }
-  public async dig(
-    days: number = 10
-  ): Promise<(AvbxIcon | undefined)[] | null> {
+  public async dig(days: number = 10): Promise<AvbxIcons> {
     return await this.repo.dig(days);
   }
   public async sweep(days: number = 10): Promise<void> {
