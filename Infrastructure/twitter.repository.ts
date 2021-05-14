@@ -2,6 +2,8 @@ import {
   GetItemCommand,
   GetItemCommandOutput,
   PutItemCommand,
+  ServiceOutputTypes,
+  UpdateItemCommand,
 } from "@aws-sdk/client-dynamodb";
 import { TwitterProfile } from "../Domain/twitter-profile";
 import { DynamoDBService } from "../Services/dynamodb.service";
@@ -69,5 +71,39 @@ export class TwitterRepository extends DynamoDBService {
       } as TwitterProfile;
     }
     return null;
+  }
+
+  public async activateUser(id: string): Promise<void> {
+    const result = await this._toggleUser(id, true);
+    console.info(result);
+  }
+
+  public async deactivateUser(id: string): Promise<void> {
+    const result = await this._toggleUser(id, false);
+    console.info(result);
+  }
+
+  private async _toggleUser(
+    id: string,
+    is_active: boolean
+  ): Promise<ServiceOutputTypes> {
+    const command = new UpdateItemCommand({
+      TableName: this._tableName,
+      Key: {
+        id: {
+          N: id,
+        },
+      },
+      ExpressionAttributeNames: {
+        "#A": "is_active",
+      },
+      ExpressionAttributeValues: {
+        ":a": {
+          BOOL: is_active,
+        },
+      },
+      UpdateExpression: "SET #A = :a",
+    });
+    return await this.update(command);
   }
 }

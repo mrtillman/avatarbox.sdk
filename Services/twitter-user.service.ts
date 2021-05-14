@@ -17,4 +17,11 @@ export class TwitterUserService {
   async find(id: string): Promise<TwitterProfile | null> {
     return await this.repo.findUser(id);
   }
+
+  public async on(id: string): Promise<void> {
+    await this.repo.activateUser(id);
+  }
+  public async off(id: string): Promise<void> {
+    await this.repo.deactivateUser(id);
+  }
 }

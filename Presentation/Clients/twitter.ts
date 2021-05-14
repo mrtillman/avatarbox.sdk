@@ -30,14 +30,14 @@ export class AvbxTwitterClient implements AvbxClient {
     const user = await this.user.find(id);
     return user ? user.isActive : false;
   }
-  fetch(id: string): Promise<any> {
-    throw new Error("Method not implemented.");
+  async fetch(id: string): Promise<TwitterProfile | null> {
+    return await this.user.find(id);
   }
-  on(id: string): Promise<void> {
-    throw new Error("Method not implemented.");
+  async on(id: string): Promise<void> {
+    return await this.user.on(id);
   }
-  off(id: string): Promise<void> {
-    throw new Error("Method not implemented.");
+  async off(id: string): Promise<void> {
+    return await this.user.off(id);
   }
   delete(...users: AvbxUser[]): Promise<void> {
     throw new Error("Method not implemented.");
