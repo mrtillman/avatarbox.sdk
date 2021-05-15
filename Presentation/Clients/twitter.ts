@@ -15,9 +15,7 @@ export class AvbxTwitterClient implements AvbxClient {
   public sqs: SQSService;
   public repo: TwitterRepository;
 
-  constructor(token: string, tokenSecret: string) {
-    this.token = token;
-    this.tokenSecret = tokenSecret;
+  constructor() {
     this.user = container.resolve("twitterUserService");
     this.s3 = container.resolve("s3");
     this.sqs = container.resolve("sqs");
