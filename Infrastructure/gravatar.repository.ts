@@ -10,7 +10,6 @@ import {
   ServiceOutputTypes,
   UpdateItemCommand,
 } from "@aws-sdk/client-dynamodb";
-import { AvbxIcon } from "../Domain/avbx-icon";
 import { GravatarUser } from "../Domain/gravatar-user";
 import { DynamoDBService } from "../Services/dynamodb.service";
 
@@ -172,61 +171,6 @@ export class GravatarRepository extends DynamoDBService {
     return userIds;
   }
 
-  public async collect(): Promise<(AvbxIcon | undefined)[] | null> {
-    const command = new ScanCommand({
-      TableName: this._tableName,
-      ScanFilter: {
-        last_updated: {
-          AttributeValueList: [{ N: this.calendar.yesterday() }],
-          ComparisonOperator: "LE",
-        },
-        is_active: {
-          AttributeValueList: [{ BOOL: true }],
-          ComparisonOperator: "EQ",
-        },
-      },
-    });
-    const result = await this.scan(command);
-    if (result.Items && result.Items.length) {
-      return result.Items.map(
-        (item) =>
-          ({
-            id: item.id.N as string,
-            imageUrl: `https://icons.avatarbox.io/u/${item.id.N}`,
-            lastUpdated: new Date(parseInt(item.last_updated.N as string)),
-            isActive: item.is_active.BOOL,
-          } as AvbxIcon)
-      );
-    }
-    return null;
-  }
-
-  public async peek(): Promise<(AvbxIcon | undefined)[] | null> {
-    const command = new ScanCommand({
-      TableName: this._tableName,
-      ScanFilter: {
-        last_updated: {
-          AttributeValueList: [{ N: this.calendar.hoursAgo(1) }],
-          ComparisonOperator: "GT",
-        },
-      },
-    });
-    return this._imageScan(command);
-  }
-
-  public async dig(days: number): Promise<(AvbxIcon | undefined)[] | null> {
-    const command = new ScanCommand({
-      TableName: this._tableName,
-      ScanFilter: {
-        last_updated: {
-          AttributeValueList: [{ N: this.calendar.daysAgo(days) }],
-          ComparisonOperator: "LE",
-        },
-      },
-    });
-    return this._imageScan(command);
-  }
-
   public async activateUser(email: string): Promise<void> {
     const result = await this._toggleUser(email, true);
     console.info(result);
@@ -282,23 +226,5 @@ export class GravatarRepository extends DynamoDBService {
       UpdateExpression: "SET #A = :a",
     });
     return await this.update(command);
-  }
-
-  private async _imageScan(
-    command: ScanCommand
-  ): Promise<(AvbxIcon | undefined)[] | null> {
-    const result = await this.scan(command);
-    if (result.Items && result.Items.length) {
-      return result.Items.map(
-        (item) =>
-          ({
-            id: item.id.N as string,
-            imageUrl: `https://icons.avatarbox.io/u/${item.id.N}`,
-            lastUpdated: new Date(parseInt(item.last_updated.N as string)),
-            isActive: item.is_active.BOOL,
-          } as AvbxIcon)
-      );
-    }
-    return null;
   }
 }
