@@ -190,7 +190,7 @@ export class TwitterRepository extends DynamoDBService {
     return await this.update(command);
   }
 
-  public async reset(id: string): Promise<void> {
+  public async reset(id: string, index: Number): Promise<void> {
     const today = this.calendar.today();
     const command = new UpdateItemCommand({
       TableName: this._tableName,
@@ -201,13 +201,17 @@ export class TwitterRepository extends DynamoDBService {
       },
       ExpressionAttributeNames: {
         "#L": "last_updated",
+        "#X": "current_avatar_index"
       },
       ExpressionAttributeValues: {
         ":l": {
           N: today,
         },
+        ":x": {
+          N: index.toString(),
+        },
       },
-      UpdateExpression: "SET #L = :l",
+      UpdateExpression: "SET #L = :l, #X = :x",
     });
     const result = await this.update(command);
     console.info(result);

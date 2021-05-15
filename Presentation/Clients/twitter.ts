@@ -70,8 +70,9 @@ export class AvbxTwitterClient implements AvbxClient {
     return this.sqs.touch(...id);
   }
   async reset(icon: AvbxIcon): Promise<void> {
-    const user = (await this.user.find(icon.id)) as TwitterProfile;
+    const user = (await this.user.find(icon.id)) as TwitterProfile;;
+    const index = (Number(user.currentAvatarIndex) + 1) % user.avatars.length;
     await this.s3.putIcon(icon.imageUrl, user.id);
-    await this.repo.reset(user.id);
+    await this.repo.reset(user.id, index);
   }
 }
