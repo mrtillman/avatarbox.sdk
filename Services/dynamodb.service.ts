@@ -24,7 +24,7 @@ export class DynamoDBService {
     this._region = process.env.REGION as string;
     this.calendar = new DynamoDbCalendar();
     this.client = new DynamoDBClient({
-      region: this._region,
+      region: this._region || "us-east-1",
     });
   }
   protected async get(command: GetItemCommand): Promise<ServiceOutputTypes> {
