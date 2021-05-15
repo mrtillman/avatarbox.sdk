@@ -2,6 +2,7 @@ import { container } from "../../Common/container";
 import { AvbxClient } from "../../Domain/avbx-client";
 import { AvbxIcons } from "../../Domain/avbx-icon";
 import { TwitterProfile } from "../../Domain/twitter-profile";
+import { TwitterRepository } from "../../Infrastructure/twitter.repository";
 import { S3Service } from "../../Services/s3.service";
 import { TwitterUserService } from "../../Services/twitter-user.service";
 
@@ -10,21 +11,25 @@ export class AvbxTwitterClient implements AvbxClient {
   public token: string;
   public tokenSecret: string;
   public s3: S3Service.AvbxIcons;
+  public repo: TwitterRepository;
 
   constructor(token: string, tokenSecret: string) {
     this.token = token;
     this.tokenSecret = tokenSecret;
     this.user = container.resolve("twitterUserService");
     this.s3 = container.resolve("s3");
+    this.repo = container.resolve("twitterRepo");
   }
 
   async sync(twitterProfile: TwitterProfile): Promise<void> {
-    const profile = await this.user.find(twitterProfile.id);
+    const profileId = twitterProfile.id;
+    const profile = await this.user.find(profileId);
     if (profile) {
       await this.user.update(twitterProfile);
     } else {
       await this.user.save(twitterProfile);
     }
+    await this.s3.putIcon(twitterProfile.avatars[0], profileId);
   }
 
   async isActive(id: string): Promise<Boolean> {
@@ -45,14 +50,14 @@ export class AvbxTwitterClient implements AvbxClient {
     await this.s3.deleteIcons(...profileIds);
     await this.user.delete(...profiles);
   }
-  collect(): Promise<AvbxIcons> {
-    throw new Error("Method not implemented.");
+  public async collect(): Promise<AvbxIcons> {
+    return await this.repo.collect();
   }
-  peek(): Promise<AvbxIcons> {
-    throw new Error("Method not implemented.");
+  public async peek(): Promise<AvbxIcons> {
+    return await this.repo.peek();
   }
-  dig(days: number): Promise<AvbxIcons> {
-    throw new Error("Method not implemented.");
+  public async dig(days: number = 10): Promise<AvbxIcons> {
+    return await this.repo.dig(days);
   }
   sweep(days: number): Promise<void> {
     throw new Error("Method not implemented.");
