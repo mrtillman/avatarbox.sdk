@@ -1,9 +1,10 @@
 import { container } from "../../Common/container";
 import { AvbxClient } from "../../Domain/avbx-client";
-import { AvbxIcons } from "../../Domain/avbx-icon";
+import { AvbxIcon, AvbxIcons } from "../../Domain/avbx-icon";
 import { TwitterProfile } from "../../Domain/twitter-profile";
 import { TwitterRepository } from "../../Infrastructure/twitter.repository";
 import { S3Service } from "../../Services/s3.service";
+import { SQSService } from "../../Services/sqs.service";
 import { TwitterUserService } from "../../Services/twitter-user.service";
 
 export class AvbxTwitterClient implements AvbxClient {
@@ -11,6 +12,7 @@ export class AvbxTwitterClient implements AvbxClient {
   public token: string;
   public tokenSecret: string;
   public s3: S3Service.AvbxIcons;
+  public sqs: SQSService;
   public repo: TwitterRepository;
 
   constructor(token: string, tokenSecret: string) {
@@ -18,6 +20,7 @@ export class AvbxTwitterClient implements AvbxClient {
     this.tokenSecret = tokenSecret;
     this.user = container.resolve("twitterUserService");
     this.s3 = container.resolve("s3");
+    this.sqs = container.resolve("sqs");
     this.repo = container.resolve("twitterRepo");
   }
 
@@ -28,8 +31,10 @@ export class AvbxTwitterClient implements AvbxClient {
       await this.user.update(twitterProfile);
     } else {
       await this.user.save(twitterProfile);
+      if(twitterProfile.avatars){
+        await this.s3.putIcon(twitterProfile.avatars[0], profileId);
+      }
     }
-    await this.s3.putIcon(twitterProfile.avatars[0], profileId);
   }
 
   async isActive(id: string): Promise<Boolean> {
@@ -63,10 +68,12 @@ export class AvbxTwitterClient implements AvbxClient {
     const userIds = await this.repo.sweep(days);
     await this.s3.deleteIcons(...userIds);
   }
-  touch(...id: string[]): Promise<any> {
-    throw new Error("Method not implemented.");
+  public touch(...id: string[]): Promise<any> {
+    return this.sqs.touch(...id);
   }
-  reset(icon: any): Promise<void> {
-    throw new Error("Method not implemented.");
+  async reset(icon: AvbxIcon): Promise<void> {
+    const user = (await this.user.find(icon.id)) as TwitterProfile;
+    await this.s3.putIcon(icon.imageUrl, user.id);
+    await this.repo.reset(user.id);
   }
 }

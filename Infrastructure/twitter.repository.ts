@@ -189,4 +189,27 @@ export class TwitterRepository extends DynamoDBService {
     });
     return await this.update(command);
   }
+
+  public async reset(id: string): Promise<void> {
+    const today = this.calendar.today();
+    const command = new UpdateItemCommand({
+      TableName: this._tableName,
+      Key: {
+        id: {
+          N: id,
+        },
+      },
+      ExpressionAttributeNames: {
+        "#L": "last_updated",
+      },
+      ExpressionAttributeValues: {
+        ":l": {
+          N: today,
+        },
+      },
+      UpdateExpression: "SET #L = :l",
+    });
+    const result = await this.update(command);
+    console.info(result);
+  }
 }
