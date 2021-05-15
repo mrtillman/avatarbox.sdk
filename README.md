@@ -79,7 +79,7 @@ $ npm run test:cov
 
 ## Usage
 
-**avatarbox.sdk** defines a [Gravatar client](https://github.com/mrtillman/avatarbox.sdk/blob/master/Presentation/Clients/gravatar-client.md) and a [Twitter client](https://github.com/mrtillman/avatarbox.sdk/blob/master/Presentation/Clients/twitter-client.md). Both implement the [AvbxClient interface](https://github.com/mrtillman/avatarbox.sdk/blob/master/Domain/avbx-client.ts).
+**avatarbox.sdk** defines a [Gravatar client](https://github.com/mrtillman/avatarbox.sdk/blob/master/Presentation/Clients/gravatar-client.md#avbxgravatarclient) and a [Twitter client](https://github.com/mrtillman/avatarbox.sdk/blob/master/Presentation/Clients/twitter-client.md#avbxtwitterclient). Both implement the [AvbxClient interface](https://github.com/mrtillman/avatarbox.sdk/blob/master/Domain/avbx-client.ts).
 
 ```js
 import { 
