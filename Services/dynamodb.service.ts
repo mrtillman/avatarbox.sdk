@@ -12,7 +12,7 @@ import {
   UpdateItemCommand,
 } from "@aws-sdk/client-dynamodb";
 import { DynamoDbCalendar } from "../Common/calendar";
-import { AvbxIcon } from "../Domain/avbx-icon";
+import { AvbxIcon, AvbxIcons } from "../Domain/avbx-icon";
 
 export class DynamoDBService {
   public calendar: DynamoDbCalendar;
@@ -54,7 +54,7 @@ export class DynamoDBService {
   ): Promise<BatchWriteItemCommandOutput> {
     return await this.client.send(command);
   }
-  public async collect(): Promise<(AvbxIcon | undefined)[] | null> {
+  public async collect(): Promise<AvbxIcons> {
     const command = new ScanCommand({
       TableName: this._tableName,
       ScanFilter: {
@@ -83,7 +83,7 @@ export class DynamoDBService {
     return null;
   }
 
-  public async peek(): Promise<(AvbxIcon | undefined)[] | null> {
+  public async peek(): Promise<AvbxIcons> {
     const command = new ScanCommand({
       TableName: this._tableName,
       ScanFilter: {
@@ -96,7 +96,7 @@ export class DynamoDBService {
     return this._imageScan(command);
   }
 
-  public async dig(days: number): Promise<(AvbxIcon | undefined)[] | null> {
+  public async dig(days: number): Promise<AvbxIcons> {
     const command = new ScanCommand({
       TableName: this._tableName,
       ScanFilter: {
@@ -111,7 +111,7 @@ export class DynamoDBService {
 
   private async _imageScan(
     command: ScanCommand
-  ): Promise<(AvbxIcon | undefined)[] | null> {
+  ): Promise<AvbxIcons> {
     const result = await this.scan(command);
     if (result.Items && result.Items.length) {
       return result.Items.map(
