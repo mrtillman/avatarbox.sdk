@@ -4,6 +4,7 @@ import {
   GetItemCommand,
   GetItemCommandOutput,
   PutItemCommand,
+  ScanCommand,
   ServiceOutputTypes,
   UpdateItemCommand,
 } from "@aws-sdk/client-dynamodb";
@@ -142,6 +143,27 @@ export class TwitterRepository extends DynamoDBService {
     const batchCommand = new BatchWriteItemCommand(batchWriteInput);
     const result = await this.batchWrite(batchCommand);
     console.info(result);
+  }
+
+  public async sweep(days: number): Promise<string[]> {
+    const scanCommand = new ScanCommand({
+      TableName: this._tableName,
+      ScanFilter: {
+        last_updated: {
+          AttributeValueList: [{ N: this.calendar.daysAgo(days) }],
+          ComparisonOperator: "LE",
+        },
+      },
+    });
+    const scanResult = await this.scan(scanCommand);
+    const profileIds: string[] = [];
+    if (scanResult.Items && scanResult.Items.length) {
+      scanResult.Items.forEach((item) => {
+        profileIds.push(item.id.N as string);
+      });
+    }
+    await this.deleteUsers(profileIds);
+    return profileIds;
   }
 
   private async _toggleUser(

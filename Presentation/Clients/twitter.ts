@@ -59,10 +59,11 @@ export class AvbxTwitterClient implements AvbxClient {
   public async dig(days: number = 10): Promise<AvbxIcons> {
     return await this.repo.dig(days);
   }
-  sweep(days: number): Promise<void> {
-    throw new Error("Method not implemented.");
+  public async sweep(days: number = 10): Promise<void> {
+    const userIds = await this.repo.sweep(days);
+    await this.s3.deleteIcons(...userIds);
   }
-  touch(...email: string[]): Promise<any> {
+  touch(...id: string[]): Promise<any> {
     throw new Error("Method not implemented.");
   }
   reset(icon: any): Promise<void> {
