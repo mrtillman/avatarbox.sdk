@@ -16,13 +16,15 @@
 **avatarbox.sdk** is a specialized library designed to facilitate the development of internal application components such as [avatarbox.publisher](https://github.com/mrtillman/avatarbox.publisher), [avatarbox.worker](https://github.com/mrtillman/avatarbox.worker), [avatarbox.app](https://github.com/mrtillman/avatarbox.app) and [avatarbox.api](https://github.com/mrtillman/avatarbox.api). Unlike a general-purpose library, **avatarbox.sdk** is tailored to back-end resources situated within the AvatarBox [Virtual Private Cloud (VPC)](https://aws.amazon.com/vpc/?vpc-blogs.sort-by=item.additionalFields.createdDate&vpc-blogs.sort-order=desc) hosted on [Amazon Web Services (AWS)](https://en.wikipedia.org/wiki/Amazon_Web_Services).
 
 ## Checklist
-
+- [Pusher Channel](https://pusher.com/channels)
 - DynamoDB table: `Gravatars` 
   - partition key: `email`
   - [Global Secondary Index](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/GSI.html) 
     - name: `index-id-email`
     - partition key: `id (Number)` 
     - sort key: `email (String)`
+- DynamoDB table: `TwitterProfiles` 
+    - partition key: `id`
 - KMS Symmetric Key
 - MySQL table: [gravatar.users](https://github.com/mrtillman/avatarbox.sdk/blob/master/gravatar.users.sql) <sup>a.</sup>
 - SQS Queue
@@ -59,44 +61,35 @@ MYSQL_USER=mrtillman
 MYSQL_PASSWORD=letmein
 MYSQL_DATABASE=gravatar
 SALT={BCRYPT-SALT}
+PUSHER_APP_ID=0000000
+PUSHER_SECRET=xxxxxxxxxxxxxxxxxxx
+PUSHER_KEY=11111112222222333333
+PUSHER_CLUSTER=xx1
 ```
 
-<!--
 ## Tests
 
 ```bash
 # unit tests
-$ npm run test
+$ npm test
 
 # test coverage
 $ npm run test:cov
 ```
--->
 
 ## Usage
 
+**avatarbox.sdk** defines a [Gravatar client](https://github.com/mrtillman/avatarbox.sdk/blob/master/Presentation/Clients/gravatar-client.md) and a [Twitter client](https://github.com/mrtillman/avatarbox.sdk/blob/master/Presentation/Clients/twitter-client.md). Both implement the [AvbxClient interface](https://github.com/mrtillman/avatarbox.sdk/blob/master/Domain/avbx-client.ts).
+
 ```js
-import { AvbxGravatarClient } from 'avatarbox.sdk';
+import { 
+  AvbxGravatarClient,
+  AvbxTwitterClient
+} from 'avatarbox.sdk';
 
-const client = new AvbxGravatarClient();
+const gravatarClient = new AvbxGravatarClient();
+const twitterClient = new AvbxTwitterClient();
 ```
-
-## Client Methods
-
-|Method|Description|
-|---|---|
-|`login(email,password)`|authenticates a Gravatar user and returns an instance of [GravatarClient](https://github.com/mrtillman/grav.client)|
-|`fetch(id\|email)`|finds a Gravatar user by `id` or `email` and returns an instance of *GravatarClient*|
-|`isActive(id\|email)`|returns a boolean value indicating whether or not auto updates are enabled|
-|`on(email)`|enable auto updates for a Gravatar user|
-|`off(email)`|disable auto updates for a Gravatar user|
-|`delete(users)`|deletes one or more [GravatarUser](https://github.com/mrtillman/avatarbox.sdk/blob/master/Domain/gravatar-user.ts)s|
-|`collect()`|returns a list of all icons in the [Ready State](https://github.com/mrtillman/avatarbox.sdk/wiki/Glossary#ready-state)|
-|`peek()`|returns a list of all icons in the [Fresh State](https://github.com/mrtillman/avatarbox.sdk/wiki/Glossary#fresh-state)|
-|`dig()`|returns a list of all icons in the [Cold State](https://github.com/mrtillman/avatarbox.sdk/wiki/Glossary#cold-state)|
-|`sweep()`|deletes all *GravatarUsers* in the *Cold State*|
-|`touch(id\|email)`|sends an SQS message to [avatarbox.worker](https://github.com/mrtillman/avatarbox.worker)|
-|`reset(icon)`|resets the timestamp indicating when the [GravatarIcon](https://github.com/mrtillman/avatarbox.sdk/blob/master/Domain/gravatar-icon.ts) was last updated |
 
 ## License
 
