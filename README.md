@@ -6,14 +6,14 @@
 
 [![Build Status](https://travis-ci.com/mrtillman/avatarbox.sdk.svg?branch=master)](https://travis-ci.com/mrtillman/avatarbox.sdk)
 [![Coverage Status](https://coveralls.io/repos/github/mrtillman/avatarbox.sdk/badge.svg?branch=master)](https://coveralls.io/github/mrtillman/avatarbox.sdk?branch=master)
-[![GitHub tag (latest SemVer)](https://img.shields.io/github/v/tag/mrtillman/avatarbox.sdk?sort=semver)](https://github.com/mrtillman/avatarbox.sdk/releases/tag/1.1.1)
+[![GitHub tag (latest SemVer)](https://img.shields.io/github/v/tag/mrtillman/avatarbox.sdk?sort=semver)](https://github.com/mrtillman/avatarbox.sdk/releases/tag/1.2.1)
 [![license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/mrtillman/avatarbox.sdk/blob/master/LICENSE)
 
 [![NPM](https://nodei.co/npm/avatarbox.sdk.png)](https://www.npmjs.com/package/avatarbox.sdk)
 
 ## Description
 
-**avatarbox.sdk** is a specialized library designed to facilitate the development of internal application components such as [avatarbox.publisher](https://github.com/mrtillman/avatarbox.publisher), [avatarbox.worker](https://github.com/mrtillman/avatarbox.worker), [avatarbox.app](https://github.com/mrtillman/avatarbox.app) and [avatarbox.api](https://github.com/mrtillman/avatarbox.api). Unlike a general-purpose library, **avatarbox.sdk** is tailored to back-end resources situated within the AvatarBox [Virtual Private Cloud (VPC)](https://aws.amazon.com/vpc/?vpc-blogs.sort-by=item.additionalFields.createdDate&vpc-blogs.sort-order=desc) hosted on [Amazon Web Services (AWS)](https://en.wikipedia.org/wiki/Amazon_Web_Services).
+**avatarbox.sdk** is a specialized library designed to facilitate the development of application components such as [avatarbox.publisher](https://github.com/mrtillman/avatarbox.publisher), [avatarbox.worker](https://github.com/mrtillman/avatarbox.worker), [avatarbox.app](https://github.com/mrtillman/avatarbox.app) and [avatarbox.api](https://github.com/mrtillman/avatarbox.api). Unlike a general-purpose library, **avatarbox.sdk** is tailored to back-end resources situated within the AvatarBox [Virtual Private Cloud (VPC)](https://aws.amazon.com/vpc/?vpc-blogs.sort-by=item.additionalFields.createdDate&vpc-blogs.sort-order=desc) hosted on [Amazon Web Services (AWS)](https://en.wikipedia.org/wiki/Amazon_Web_Services).
 
 ## Checklist
 - [Pusher Channel](https://pusher.com/channels)
