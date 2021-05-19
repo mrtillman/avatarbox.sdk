@@ -17,7 +17,6 @@ container.register({
     peek: jest.fn(),
     dig: jest.fn(),
     reset: jest.fn(),
-    sweep: jest.fn(),
   }),
   sqs: awilix.asValue({
     touch: jest.fn(),
@@ -67,16 +66,6 @@ describe("AvbxGravatarClient", () => {
     const result = await avbxClient.collect();
 
     expect(result).toBeDefined();
-  });
-  it("should sweep", async () => {
-    const userIds = [1, 2];
-    const deleteIcons = avbxClient.s3.deleteIcons as jest.Mock;
-    const sweep = avbxClient.repo.sweep as jest.Mock;
-    sweep.mockReturnValue(userIds);
-
-    await avbxClient.sweep();
-
-    expect(deleteIcons.mock.calls[0]).toEqual(userIds);
   });
   it("should touch", async () => {
     const touch = avbxClient.sqs.touch as jest.Mock;

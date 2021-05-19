@@ -11,7 +11,6 @@
 |`collect()`|returns a list of all Twitter icons in the [Ready State](https://github.com/mrtillman/avatarbox.sdk/wiki/Glossary#ready-state)|
 |`peek()`|returns a list of all Twitter icons in the [Fresh State](https://github.com/mrtillman/avatarbox.sdk/wiki/Glossary#fresh-state)|
 |`dig()`|returns a list of all Twitter icons in the [Cold State](https://github.com/mrtillman/avatarbox.sdk/wiki/Glossary#cold-state)|
-|`sweep()`|deletes all *TwitterProfiles* in the *Cold State*|
 |`touch(id)`|sends an SQS message to [avatarbox.worker](https://github.com/mrtillman/avatarbox.worker)|
 |`reset(icon)`|resets the timestamp indicating when the Twitter icon was last updated <sup>b.</sup> |
 

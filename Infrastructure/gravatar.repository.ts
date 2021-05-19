@@ -148,29 +148,6 @@ export class GravatarRepository extends DynamoDBService {
     console.info(result);
   }
 
-  public async sweep(days: number): Promise<string[]> {
-    const scanCommand = new ScanCommand({
-      TableName: this._tableName,
-      ScanFilter: {
-        last_updated: {
-          AttributeValueList: [{ N: this.calendar.daysAgo(days) }],
-          ComparisonOperator: "LE",
-        },
-      },
-    });
-    const scanResult = await this.scan(scanCommand);
-    const emails: string[] = [];
-    const userIds: string[] = [];
-    if (scanResult.Items && scanResult.Items.length) {
-      scanResult.Items.forEach((item) => {
-        emails.push(item.email.S as string);
-        userIds.push(item.id.N as string);
-      });
-    }
-    await this.deleteUsers(emails);
-    return userIds;
-  }
-
   public async activateUser(email: string): Promise<void> {
     const result = await this._toggleUser(email, true);
     console.info(result);

@@ -62,10 +62,6 @@ export class AvbxTwitterClient implements AvbxClient {
   public async dig(days: number = 10): Promise<AvbxIcons> {
     return await this.repo.dig(days);
   }
-  public async sweep(days: number = 10): Promise<void> {
-    const userIds = await this.repo.sweep(days);
-    await this.s3.deleteIcons(...userIds);
-  }
   public touch(...id: string[]): Promise<any> {
     return this.sqs.touch(...id);
   }

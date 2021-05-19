@@ -10,7 +10,6 @@ export interface AvbxClient {
   collect(): Promise<AvbxIcons>;
   peek(): Promise<AvbxIcons>;
   dig(days: number): Promise<AvbxIcons>;
-  sweep(days: number): Promise<void>;
   touch(...email: string[]): Promise<any>;
   reset(icon: any): Promise<void>;
 }

@@ -145,27 +145,6 @@ export class TwitterRepository extends DynamoDBService {
     console.info(result);
   }
 
-  public async sweep(days: number): Promise<string[]> {
-    const scanCommand = new ScanCommand({
-      TableName: this._tableName,
-      ScanFilter: {
-        last_updated: {
-          AttributeValueList: [{ N: this.calendar.daysAgo(days) }],
-          ComparisonOperator: "LE",
-        },
-      },
-    });
-    const scanResult = await this.scan(scanCommand);
-    const profileIds: string[] = [];
-    if (scanResult.Items && scanResult.Items.length) {
-      scanResult.Items.forEach((item) => {
-        profileIds.push(item.id.N as string);
-      });
-    }
-    await this.deleteUsers(profileIds);
-    return profileIds;
-  }
-
   private async _toggleUser(
     id: string,
     is_active: boolean
