@@ -68,19 +68,7 @@ export class DynamoDBService {
         },
       },
     });
-    const result = await this.scan(command);
-    if (result.Items && result.Items.length) {
-      return result.Items.map(
-        (item) =>
-          ({
-            id: item.id.N as string,
-            imageUrl: `https://icons.avatarbox.io/u/${item.id.N}`,
-            lastUpdated: new Date(parseInt(item.last_updated.N as string)),
-            isActive: item.is_active.BOOL,
-          } as AvbxIcon)
-      );
-    }
-    return null;
+    return await this._imageScan(command);
   }
 
   public async peek(): Promise<AvbxIcons> {
@@ -114,6 +102,8 @@ export class DynamoDBService {
   ): Promise<AvbxIcons> {
     const result = await this.scan(command);
     if (result.Items && result.Items.length) {
+      let source = "gravatar";
+      if(/twitter/i.test(this._tableName)) source = "twitter";
       return result.Items.map(
         (item) =>
           ({
@@ -121,6 +111,7 @@ export class DynamoDBService {
             imageUrl: `https://icons.avatarbox.io/u/${item.id.N}`,
             lastUpdated: new Date(parseInt(item.last_updated.N as string)),
             isActive: item.is_active.BOOL,
+            source
           } as AvbxIcon)
       );
     }
