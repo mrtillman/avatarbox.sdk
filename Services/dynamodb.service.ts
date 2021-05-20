@@ -97,13 +97,11 @@ export class DynamoDBService {
     return this._imageScan(command);
   }
 
-  private async _imageScan(
-    command: ScanCommand
-  ): Promise<AvbxIcons> {
+  private async _imageScan(command: ScanCommand): Promise<AvbxIcons> {
     const result = await this.scan(command);
     if (result.Items && result.Items.length) {
       let source = "gravatar";
-      if(/twitter/i.test(this._tableName)) source = "twitter";
+      if (/twitter/i.test(this._tableName)) source = "twitter";
       return result.Items.map(
         (item) =>
           ({
@@ -111,7 +109,7 @@ export class DynamoDBService {
             imageUrl: `https://icons.avatarbox.io/u/${item.id.N}`,
             lastUpdated: new Date(parseInt(item.last_updated.N as string)),
             isActive: item.is_active.BOOL,
-            source
+            source,
           } as AvbxIcon)
       );
     }

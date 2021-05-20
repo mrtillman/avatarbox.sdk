@@ -29,7 +29,7 @@ export class AvbxTwitterClient implements AvbxClient {
       await this.user.update(twitterProfile);
     } else {
       await this.user.save(twitterProfile);
-      if(twitterProfile.avatars){
+      if (twitterProfile.avatars) {
         await this.s3.putIcon(twitterProfile.avatars[0], profileId);
       }
     }
@@ -66,7 +66,7 @@ export class AvbxTwitterClient implements AvbxClient {
     return this.sqs.touch(...id);
   }
   async reset(icon: AvbxIcon): Promise<void> {
-    const user = (await this.user.find(icon.id)) as TwitterProfile;;
+    const user = (await this.user.find(icon.id)) as TwitterProfile;
     const index = (Number(user.currentAvatarIndex) + 1) % user.avatars.length;
     await this.s3.putIcon(icon.imageUrl, user.id);
     await this.repo.reset(user.id, index);
