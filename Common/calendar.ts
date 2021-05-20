@@ -10,6 +10,9 @@ export class Calendar {
   daysAgo(days: number): Date {
     return moment().subtract(days, "days").toDate();
   }
+  daysAhead(days: number): Date {
+    return moment().add(days, "days").toDate();
+  }
   today(): Date {
     return moment().startOf("minute").toDate();
   }
@@ -24,7 +27,11 @@ export class DynamoDbCalendar {
   constructor() {
     this._calendar = new Calendar();
   }
-
+  daysAhead(days: number = 10): string {
+    return Math.floor(
+      this._calendar.daysAhead(days).getTime() / 1000
+    ).toString();
+  }
   yesterday(): string {
     return this._calendar.yesterday().getTime().toString();
   }
