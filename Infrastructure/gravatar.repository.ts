@@ -6,7 +6,6 @@ import {
   PutItemCommand,
   QueryCommand,
   QueryCommandOutput,
-  ScanCommand,
   ServiceOutputTypes,
   UpdateItemCommand,
 } from "@aws-sdk/client-dynamodb";
@@ -160,6 +159,7 @@ export class GravatarRepository extends DynamoDBService {
 
   public async reset(email: string): Promise<void> {
     const today = this.calendar.today();
+    const expires_on = this.calendar.daysAhead();
     const command = new UpdateItemCommand({
       TableName: this._tableName,
       Key: {
@@ -169,13 +169,17 @@ export class GravatarRepository extends DynamoDBService {
       },
       ExpressionAttributeNames: {
         "#L": "last_updated",
+        "#E": "expires_on",
       },
       ExpressionAttributeValues: {
         ":l": {
           N: today,
         },
+        ":e": {
+          N: expires_on,
+        },
       },
-      UpdateExpression: "SET #L = :l",
+      UpdateExpression: "SET #L = :l, #E = :e",
     });
     const result = await this.update(command);
     console.info(result);

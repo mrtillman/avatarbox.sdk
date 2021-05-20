@@ -4,7 +4,6 @@ import {
   GetItemCommand,
   GetItemCommandOutput,
   PutItemCommand,
-  ScanCommand,
   ServiceOutputTypes,
   UpdateItemCommand,
 } from "@aws-sdk/client-dynamodb";
@@ -171,6 +170,7 @@ export class TwitterRepository extends DynamoDBService {
 
   public async reset(id: string, index: Number): Promise<void> {
     const today = this.calendar.today();
+    const expires_on = this.calendar.daysAhead();
     const command = new UpdateItemCommand({
       TableName: this._tableName,
       Key: {
@@ -180,7 +180,8 @@ export class TwitterRepository extends DynamoDBService {
       },
       ExpressionAttributeNames: {
         "#L": "last_updated",
-        "#X": "current_avatar_index"
+        "#X": "current_avatar_index",
+        "#E": "expires_on",
       },
       ExpressionAttributeValues: {
         ":l": {
@@ -189,8 +190,11 @@ export class TwitterRepository extends DynamoDBService {
         ":x": {
           N: index.toString(),
         },
+        ":e": {
+          N: expires_on,
+        },
       },
-      UpdateExpression: "SET #L = :l, #X = :x",
+      UpdateExpression: "SET #L = :l, #X = :x, #E = :e",
     });
     const result = await this.update(command);
     console.info(result);
