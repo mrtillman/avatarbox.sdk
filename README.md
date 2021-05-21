@@ -19,12 +19,16 @@
 - [Pusher Channel](https://pusher.com/channels)
 - DynamoDB table: `Gravatars` 
   - partition key: `email`
+  - enable [DynamoDB stream](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Streams.html#Streams.Enabling)
+  - enable [TTL](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/time-to-live-ttl-how-to.html) using the `expires_on` field
+  - define trigger: [avbx-trigger-gravatar-deleted](https://github.com/mrtillman-0001/avbx-trigger-gravatar-deleted)
   - [Global Secondary Index](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/GSI.html) 
     - name: `index-id-email`
     - partition key: `id (Number)` 
-    - sort key: `email (String)`
+    - sort key: `email (String)`    
 - DynamoDB table: `TwitterProfiles` 
     - partition key: `id`
+    - enable [TTL](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/time-to-live-ttl-how-to.html) using the `expires_on` field
 - KMS Symmetric Key
 - MySQL table: [gravatar.users](https://github.com/mrtillman/avatarbox.sdk/blob/master/gravatar.users.sql) <sup>a.</sup>
 - SQS Queue
