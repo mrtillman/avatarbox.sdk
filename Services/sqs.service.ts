@@ -1,4 +1,5 @@
 import { SQSClient, SendMessageBatchCommand } from "@aws-sdk/client-sqs";
+import { AvbxIcon } from "../Domain/avbx-icon";
 
 export class SQSService {
   client: SQSClient;
@@ -8,13 +9,13 @@ export class SQSService {
     });
   }
 
-  touch(...emails: string[]): Promise<any> {
+  touch(...icons: AvbxIcon[]): Promise<any> {
     const command = new SendMessageBatchCommand({
-      Entries: emails.map(
-        (email, id) =>
+      Entries: icons.map(
+        (id, source) =>
           ({
             Id: id,
-            MessageBody: email,
+            MessageBody: [id, source].join(","),
           } as any)
       ),
       QueueUrl: process.env.QUEUE_URL,
