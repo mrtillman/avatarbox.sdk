@@ -1,4 +1,4 @@
-import { AvbxIcons } from "./avbx-icon";
+import { AvbxIcon, AvbxIcons } from "./avbx-icon";
 import { AvbxUser } from "./avbx-user";
 
 export interface AvbxClient {
@@ -10,6 +10,6 @@ export interface AvbxClient {
   collect(): Promise<AvbxIcons>;
   peek(): Promise<AvbxIcons>;
   dig(days: number): Promise<AvbxIcons>;
-  touch(...email: string[]): Promise<any>;
-  reset(icon: any): Promise<void>;
+  touch(...icon: AvbxIcon[]): Promise<any>;
+  reset(icon: AvbxIcon): Promise<void>;
 }
