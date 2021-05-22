@@ -12,7 +12,7 @@ export class SQSService {
   touch(...icons: AvbxIcon[]): Promise<any> {
     const command = new SendMessageBatchCommand({
       Entries: icons.map(
-        (id, source) =>
+        ({ id, source }) =>
           ({
             Id: id,
             MessageBody: [id, source].join(","),
