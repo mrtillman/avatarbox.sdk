@@ -62,8 +62,8 @@ export class AvbxTwitterClient implements AvbxClient {
   public async dig(days: number = 10): Promise<AvbxIcons> {
     return await this.repo.dig(days);
   }
-  public touch(...id: string[]): Promise<any> {
-    return this.sqs.touch(...id);
+  public touch(...icons: AvbxIcon[]): Promise<any> {
+    return this.sqs.touch(...icons);
   }
   async reset(icon: AvbxIcon): Promise<void> {
     const user = (await this.user.find(icon.id)) as TwitterProfile;

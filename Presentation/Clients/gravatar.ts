@@ -1,10 +1,9 @@
 import { GravatarClient } from "grav.client";
 import { SQSService } from "../../Services/sqs.service";
-import { GravatarIcon } from "../../Domain/gravatar-icon";
 import { S3Service } from "../../Services/s3.service";
 import { GravatarUser } from "../../Domain/gravatar-user";
 import { container } from "../../Common/container";
-import { AvbxIcons } from "../../Domain/avbx-icon";
+import { AvbxIcon, AvbxIcons } from "../../Domain/avbx-icon";
 import { GravatarRepository } from "../../Infrastructure/gravatar.repository";
 import { GravatarUserService } from "../../Services/gravatar-user.service";
 import { AvbxClient } from "../../Domain/avbx-client";
@@ -88,11 +87,11 @@ export class AvbxGravatarClient implements AvbxClient {
   public async dig(days: number = 10): Promise<AvbxIcons> {
     return await this.repo.dig(days);
   }
-  public touch(...email: string[]): Promise<any> {
-    return this.sqs.touch(...email);
+  public touch(...icons: AvbxIcon[]): Promise<any> {
+    return this.sqs.touch(...icons);
   }
-  public async reset(icon: GravatarIcon): Promise<void> {
-    const user = (await this.user.find(icon.email)) as GravatarUser;
+  public async reset(icon: AvbxIcon): Promise<void> {
+    const user = (await this.user.findById(icon.id)) as GravatarUser;
     await this.s3.putIcon(icon.imageUrl, user.id);
     await this.repo.reset(user.email);
   }

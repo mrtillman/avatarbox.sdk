@@ -1,6 +1,7 @@
 import { container } from "../../Common/container";
 import { AvbxTwitterClient } from "./twitter";
 import * as awilix from "awilix";
+import { AvbxIcon } from "../../Domain/avbx-icon";
 
 container.register({
   kms: awilix.asValue({
@@ -60,9 +61,10 @@ describe("AvbxTwitterClient", () => {
   });
   it("should touch", async () => {
     const touch = avbxClient.sqs.touch as jest.Mock;
+    const id = userId.toString();
+    const icon = { id } as AvbxIcon
+    await avbxClient.touch(icon);
 
-    await avbxClient.touch(userId);
-
-    expect(touch.mock.calls[0]).toEqual([userId]);
+    expect(touch.mock.calls[0]).toEqual([icon]);
   });
 });

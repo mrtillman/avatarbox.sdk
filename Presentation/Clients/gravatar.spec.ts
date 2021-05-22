@@ -1,7 +1,7 @@
 import { container } from "../../Common/container";
 import { AvbxGravatarClient } from "./gravatar";
 import * as awilix from "awilix";
-import { GravatarIcon } from "../../Domain/gravatar-icon";
+import { AvbxIcon } from "../../Domain/avbx-icon";
 
 container.register({
   kms: awilix.asValue({
@@ -34,6 +34,7 @@ container.register({
 const userId = 1;
 const imageUrl =
   "https://www.gravatar.com/avatar/205e460b479e2e5b48aec07710c08d50";
+const icon = { id: userId.toString(), imageUrl } as AvbxIcon;
 const email = "user1@example.com";
 const emailHash = "111d68d06e2d317b5a59c2c6c5bad808";
 const password = "letmein";
@@ -69,10 +70,9 @@ describe("AvbxGravatarClient", () => {
   });
   it("should touch", async () => {
     const touch = avbxClient.sqs.touch as jest.Mock;
+    await avbxClient.touch(icon);
 
-    await avbxClient.touch(email);
-
-    expect(touch.mock.calls[0]).toEqual([email]);
+    expect(touch.mock.calls[0]).toEqual([icon]);
   });
   describe("login", () => {
     it("should save user", async () => {
@@ -115,7 +115,7 @@ describe("AvbxGravatarClient", () => {
     it("should find user by id", async () => {
       const findById = avbxClient.user.findById as jest.Mock;
 
-      await avbxClient.isActive(userId.toString());
+      await avbxClient.isActive(icon.id);
 
       expect(findById.mock.calls.length).toBe(1);
     });
@@ -131,7 +131,7 @@ describe("AvbxGravatarClient", () => {
     it("should find user by id", async () => {
       const findById = avbxClient.user.findById as jest.Mock;
 
-      await avbxClient.fetch(userId.toString());
+      await avbxClient.fetch(icon.id);
 
       expect(findById.mock.calls.length).toBe(1);
     });
@@ -213,26 +213,18 @@ describe("AvbxGravatarClient", () => {
   });
   describe("reset", () => {
     beforeEach(() => {
-      const find = avbxClient.user.find as jest.Mock;
-      find.mockReturnValue({ id: userId, email });
+      const findById = avbxClient.user.findById as jest.Mock;
+      findById.mockReturnValue({ id: userId, email });
     });
     it("should update S3 icon", async () => {
       const putIcon = avbxClient.s3.putIcon as jest.Mock;
-
-      await avbxClient.reset({
-        email,
-        imageUrl,
-      } as GravatarIcon);
+      await avbxClient.reset(icon);
 
       expect(putIcon.mock.calls[0]).toEqual([imageUrl, userId]);
     });
     it("should update timestamp", async () => {
       const reset = avbxClient.repo.reset as jest.Mock;
-
-      await avbxClient.reset({
-        email,
-        imageUrl,
-      } as GravatarIcon);
+      await avbxClient.reset(icon);
 
       expect(reset.mock.calls[0]).toEqual([email]);
     });
