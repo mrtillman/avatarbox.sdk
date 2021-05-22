@@ -11,9 +11,7 @@
 |`collect()`|returns a list of all Twitter icons in the [Ready State](https://github.com/mrtillman/avatarbox.sdk/wiki/Glossary#ready-state)|
 |`peek()`|returns a list of all Twitter icons in the [Fresh State](https://github.com/mrtillman/avatarbox.sdk/wiki/Glossary#fresh-state)|
 |`dig()`|returns a list of all Twitter icons in the [Cold State](https://github.com/mrtillman/avatarbox.sdk/wiki/Glossary#cold-state)|
-|`touch(id)`|sends an SQS message to [avatarbox.worker](https://github.com/mrtillman/avatarbox.worker)|
-|`reset(icon)`|resets the timestamp indicating when the Twitter icon was last updated <sup>b.</sup> |
+|`touch(icon)`|sends an SQS message to [avatarbox.worker](https://github.com/mrtillman/avatarbox.worker)|
+|`reset(icon)`|resets the timestamp indicating when the Twitter icon was last updated |
 
 > a. The the *TwitterProfile* represents the [User object](https://developer.twitter.com/en/docs/twitter-api/data-dictionary/object-model/user) returned from the Twitter API during authentication. It is stored locally in DynamoDB and updated after each login.
-
-> b. The Twitter icon is expressed as an [AvbxIcon](https://github.com/mrtillman/avatarbox.sdk/blob/master/Domain/avbx-icon.ts).

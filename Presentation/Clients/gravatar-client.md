@@ -11,5 +11,5 @@
 |`collect()`|returns a list of all Gravatar icons in the [Ready State](https://github.com/mrtillman/avatarbox.sdk/wiki/Glossary#ready-state)|
 |`peek()`|returns a list of all Gravatar icons in the [Fresh State](https://github.com/mrtillman/avatarbox.sdk/wiki/Glossary#fresh-state)|
 |`dig()`|returns a list of all Gravatar icons in the [Cold State](https://github.com/mrtillman/avatarbox.sdk/wiki/Glossary#cold-state)|
-|`touch(id\|email)`|sends an SQS message to [avatarbox.worker](https://github.com/mrtillman/avatarbox.worker)|
-|`reset(icon)`|resets the timestamp indicating when the [GravatarIcon](https://github.com/mrtillman/avatarbox.sdk/blob/master/Domain/gravatar-icon.ts) was last updated |
+|`touch(icon)`|sends an SQS message to [avatarbox.worker](https://github.com/mrtillman/avatarbox.worker)|
+|`reset(icon)`|resets the timestamp indicating when the Gravatar icon was last updated |
