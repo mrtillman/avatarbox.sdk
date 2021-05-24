@@ -22,7 +22,7 @@ export class AvbxTwitterClient implements AvbxClient {
     this.repo = container.resolve("twitterRepo");
   }
 
-  async sync(twitterProfile: TwitterProfile): Promise<void> {
+  async sync(twitterProfile: TwitterProfile): Promise<TwitterProfile | null> {
     const profileId = twitterProfile.id;
     const profile = await this.user.find(profileId);
     if (profile) {
@@ -33,6 +33,7 @@ export class AvbxTwitterClient implements AvbxClient {
         await this.s3.putIcon(twitterProfile.avatars[0], profileId);
       }
     }
+    return await this.fetch(profileId);
   }
 
   async isActive(id: string): Promise<Boolean> {
