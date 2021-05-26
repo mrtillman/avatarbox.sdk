@@ -14,6 +14,7 @@ export class AvbxTwitterClient implements AvbxClient {
   public s3: S3Service.AvbxIcons;
   public sqs: SQSService;
   public repo: TwitterRepository;
+  public profile: TwitterProfile;
 
   constructor() {
     this.user = container.resolve("twitterUserService");
@@ -33,6 +34,7 @@ export class AvbxTwitterClient implements AvbxClient {
         await this.s3.putIcon(twitterProfile.avatars[0], profileId);
       }
     }
+    this.profile = twitterProfile;
     return await this.fetch(profileId);
   }
 
