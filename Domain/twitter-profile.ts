@@ -7,4 +7,5 @@ export interface TwitterProfile {
   lastUpdated: Date;
   avatars: string[];
   currentAvatarIndex: Number;
+  source: string;
 }

@@ -92,6 +92,7 @@ export class TwitterRepository extends DynamoDBService {
     const result = (await this.get(command)) as GetItemCommandOutput;
     if (result.Item) {
       return {
+        source: "twitter",
         id: result.Item.id.N,
         username: result.Item.username.S,
         token: result.Item.token.S,
@@ -99,7 +100,7 @@ export class TwitterRepository extends DynamoDBService {
         isActive: result.Item.is_active.BOOL,
         lastUpdated: new Date(parseInt(result.Item.last_updated.N as string)),
         avatars: result.Item.avatars.SS,
-        currentAvatarIndex: Number(result.Item.current_avatar_index.N),
+        currentAvatarIndex: Number(result.Item.current_avatar_index.N)
       } as TwitterProfile;
     }
     return null;

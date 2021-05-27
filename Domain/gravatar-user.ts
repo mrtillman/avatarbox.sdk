@@ -5,4 +5,5 @@ export interface GravatarUser {
   password: string;
   isActive: boolean;
   lastUpdated: Date;
+  source: string;
 }

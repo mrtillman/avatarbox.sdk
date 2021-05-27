@@ -30,6 +30,7 @@ export class GravatarRepository extends DynamoDBService {
     const result = (await this.get(command)) as GetItemCommandOutput;
     if (result.Item) {
       return {
+        source: "gravatar",
         id: result.Item.id.N,
         email: result.Item.email.S,
         emailHash: result.Item.email_hash.S,
@@ -58,6 +59,7 @@ export class GravatarRepository extends DynamoDBService {
     return (
       user &&
       ({
+        source: "gravatar",
         id: user.id.N,
         email: user.email.S,
         emailHash: user.email_hash.S,
