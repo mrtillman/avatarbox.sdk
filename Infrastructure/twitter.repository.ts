@@ -36,7 +36,9 @@ export class TwitterRepository extends DynamoDBService {
           N: "0",
         },
         avatars: {
-          SS: profile.avatars,
+          L: profile.avatars.map(imageUrl => ({
+            S: imageUrl
+          })),
         },
         last_updated: {
           N: this.calendar.yesterday(),
@@ -99,7 +101,7 @@ export class TwitterRepository extends DynamoDBService {
         tokenSecret: result.Item.token_secret.S,
         isActive: result.Item.is_active.BOOL,
         lastUpdated: new Date(parseInt(result.Item.last_updated.N as string)),
-        avatars: result.Item.avatars.SS,
+        avatars: result.Item.avatars.L?.map(avatar => avatar.S),
         currentAvatarIndex: Number(result.Item.current_avatar_index.N)
       } as TwitterProfile;
     }
