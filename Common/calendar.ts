@@ -21,7 +21,7 @@ export class Calendar {
   }
 }
 
-export class DynamoDbCalendar {
+export class UnixCalendar {
   private _calendar: Calendar;
 
   constructor() {

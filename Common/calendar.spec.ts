@@ -1,4 +1,4 @@
-import { Calendar, DynamoDbCalendar } from "./calendar";
+import { Calendar, UnixCalendar } from "./calendar";
 import moment from "moment";
 
 describe("Calendar", () => {
@@ -39,10 +39,10 @@ describe("Calendar", () => {
   });
 });
 
-describe("DynamoDbCalendar", () => {
-  let calendar: DynamoDbCalendar;
+describe("UnixCalendar", () => {
+  let calendar: UnixCalendar;
   beforeEach(() => {
-    calendar = new DynamoDbCalendar();
+    calendar = new UnixCalendar();
   });
   it("should compute now as timestamp", () => {
     const now = new Date();

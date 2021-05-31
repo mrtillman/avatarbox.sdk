@@ -11,18 +11,18 @@ import {
   ServiceOutputTypes,
   UpdateItemCommand,
 } from "@aws-sdk/client-dynamodb";
-import { DynamoDbCalendar } from "../Common/calendar";
+import { UnixCalendar } from "../Common/calendar";
 import { AvbxIcon, AvbxIcons } from "../Domain/avbx-icon";
 
 export class DynamoDBService {
-  public calendar: DynamoDbCalendar;
+  public calendar: UnixCalendar;
   public client: DynamoDBClient;
   protected _tableName: string;
   private _region: string;
 
   constructor() {
     this._region = process.env.REGION as string;
-    this.calendar = new DynamoDbCalendar();
+    this.calendar = new UnixCalendar();
     this.client = new DynamoDBClient({
       region: this._region || "us-east-1",
     });
