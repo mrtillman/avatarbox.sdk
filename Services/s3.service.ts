@@ -8,7 +8,7 @@ import {
   DeleteObjectsCommandOutput,
   ObjectIdentifier,
 } from "@aws-sdk/client-s3";
-import { Calendar } from "../Common/calendar";
+import { UnixCalendar } from "../Common/calendar";
 
 class S3ServiceBase {
   protected _client: S3Client;
@@ -34,11 +34,11 @@ class S3ServiceBase {
 
 export namespace S3Service {
   export class AvbxIcons extends S3ServiceBase {
-    private _calendar: Calendar;
+    private _calendar: UnixCalendar;
 
     constructor() {
       super();
-      this._calendar = new Calendar();
+      this._calendar = new UnixCalendar();
     }
 
     public async deleteIcon(
@@ -78,6 +78,40 @@ export namespace S3Service {
 
               await this._client.send(command);
               resolve(`https://icons.avatarbox.io/u/${_timestamp}`);
+            } catch (error) {
+              reject(error);
+            }
+          })
+          .on("error", (err) => {
+            reject(err);
+          })
+          .end();
+      });
+    }
+    public async pushIcon(
+      imageUrl: string,
+      userId: string = ""
+    ): Promise<string> {
+      return new Promise<string>(async (resolve, reject) => {
+        https
+          .request(imageUrl, async (response) => {
+            try {
+              const timestamp = this._calendar.now();
+              const key = `u/${userId}/${timestamp}`;
+              const contentLength = response.headers[
+                "content-length"
+              ] as string;
+              const contentType = response.headers["content-type"] as string;
+              const command = new PutObjectCommand({
+                Bucket: this._bucketName,
+                ACL: "public-read",
+                Key: key,
+                ContentType: contentType,
+                ContentLength: Number(contentLength),
+                Body: response,
+              });
+              await this._client.send(command);
+              resolve(`https://icons.avatarbox.io/${key}`);
             } catch (error) {
               reject(error);
             }

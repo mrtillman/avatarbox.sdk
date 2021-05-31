@@ -29,10 +29,12 @@ export class AvbxTwitterClient implements AvbxClient {
     if (profile) {
       await this.user.update(twitterProfile);
     } else {
+      const twitterIconUrl = twitterProfile.avatars[0];
+      await this.s3.putIcon(twitterIconUrl, profileId);
+      twitterProfile.avatars = [        
+        await this.s3.pushIcon(twitterIconUrl, profileId)
+      ];
       await this.user.save(twitterProfile);
-      if (twitterProfile.avatars) {
-        await this.s3.putIcon(twitterProfile.avatars[0], profileId);
-      }
     }
     this.profile = twitterProfile;
     return await this.fetch(profileId);
