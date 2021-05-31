@@ -52,6 +52,67 @@ export class TwitterRepository extends DynamoDBService {
     console.info(result);
   }
 
+  async deleteImage(userId: string, imageId: string){
+    const profile = await this.findUser(userId);
+    if(!profile) return false;
+    let avatars: string[] = [];
+    let imageIndex = Number(imageId);
+    if(isNaN(imageIndex)){
+      const rgx = new RegExp(imageId.trim(), "i");
+      avatars = profile.avatars.filter(imageUrl => !rgx.test(imageUrl));
+    } else {
+      avatars = profile.avatars.filter((imageUrl, index) => (
+        index != imageIndex
+      ));
+    }
+    const command = new UpdateItemCommand({
+      TableName: this._tableName,
+      Key: {
+        id: {
+          N: userId,
+        },
+      },
+      ExpressionAttributeNames: {
+        "#A": "avatars",
+      },
+      ExpressionAttributeValues: {
+        ":a": {
+          L: avatars.map((imageUrl) => ({
+            S: imageUrl,
+          })),
+        },
+      },
+      UpdateExpression: "SET #A = :a",
+    });
+    await this.update(command);
+  }
+
+  async pushImage(userId: string, imageUrl: string){
+    const profile = await this.findUser(userId);
+    if(!profile) return false;
+    profile.avatars.push(imageUrl.trim());
+    const command = new UpdateItemCommand({
+      TableName: this._tableName,
+      Key: {
+        id: {
+          N: userId,
+        },
+      },
+      ExpressionAttributeNames: {
+        "#A": "avatars",
+      },
+      ExpressionAttributeValues: {
+        ":a": {
+          L: profile.avatars.map((imageUrl) => ({
+            S: imageUrl,
+          })),
+        },
+      },
+      UpdateExpression: "SET #A = :a",
+    });
+    await this.update(command);
+  }
+
   async updateUser(profile: TwitterProfile): Promise<void> {
     const command = new UpdateItemCommand({
       TableName: this._tableName,

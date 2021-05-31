@@ -3,6 +3,8 @@
 |Method|Description|
 |---|---|
 |`sync(twitterProfile)`|updates the local [TwitterProfile](https://github.com/mrtillman/avatarbox.sdk/blob/master/Domain/twitter-profile.ts) <sup>a.</sup>|
+|`addImage(id, imageUrl)`|add image to the avatar collection|
+|`deleteImage(id, imageId)`|remove image from the avatar collection <sup>b.</sup>|
 |`fetch(id)`|finds a *TwitterProfile* by `id`|
 |`isActive(id)`|returns a boolean value indicating whether or not auto updates are enabled|
 |`on(id)`|enable auto updates for a Twitter user|
@@ -15,3 +17,5 @@
 |`reset(icon)`|resets the timestamp indicating when the Twitter icon was last updated |
 
 > a. The the *TwitterProfile* represents the [User object](https://developer.twitter.com/en/docs/twitter-api/data-dictionary/object-model/user) returned from the Twitter API during authentication. It is stored locally in DynamoDB and updated after each login.
+
+> b. Use the image url or the image array index for the `imageId` parameter.

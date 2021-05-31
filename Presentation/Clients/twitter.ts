@@ -40,6 +40,14 @@ export class AvbxTwitterClient implements AvbxClient {
     return await this.fetch(profileId);
   }
 
+  async addImage(id: string, imageUrl: string): Promise<void> {
+    await this.repo.pushImage(id, imageUrl);
+  }
+
+  async deleteImage(id: string, imageId: string): Promise<void> {
+    await this.repo.deleteImage(id, imageId);
+  }
+
   async isActive(id: string): Promise<Boolean> {
     const user = await this.user.find(id);
     return user ? user.isActive : false;
