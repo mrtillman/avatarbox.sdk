@@ -62,7 +62,7 @@ describe("AvbxTwitterClient", () => {
   it("should touch", async () => {
     const touch = avbxClient.sqs.touch as jest.Mock;
     const id = userId.toString();
-    const icon = { id } as AvbxIcon
+    const icon = { id } as AvbxIcon;
     await avbxClient.touch(icon);
 
     expect(touch.mock.calls[0]).toEqual([icon]);
