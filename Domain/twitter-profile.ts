@@ -6,6 +6,6 @@ export interface TwitterProfile {
   isActive: Boolean;
   lastUpdated: Date;
   avatars: string[];
-  currentAvatarIndex: Number;
+  currentAvatarIndex: number;
   source: string;
 }

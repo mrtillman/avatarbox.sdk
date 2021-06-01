@@ -45,7 +45,8 @@ export class AvbxTwitterClient implements AvbxClient {
   }
 
   async deleteImage(id: string, imageId: string): Promise<void> {
-    await this.repo.deleteImage(id, imageId);
+    const newPrimaryIcon = await this.repo.deleteImage(id, imageId);
+    if(newPrimaryIcon) await this.s3.putIcon(newPrimaryIcon);
   }
 
   async isActive(id: string): Promise<Boolean> {

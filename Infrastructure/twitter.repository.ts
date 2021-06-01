@@ -52,19 +52,32 @@ export class TwitterRepository extends DynamoDBService {
     console.info(result);
   }
 
-  async deleteImage(userId: string, imageId: string){
+  async deleteImage(userId: string, imageId: string) {
     const profile = await this.findUser(userId);
-    if(!profile) return false;
+    if (!profile) return false;
+    let targetIndex = Number(imageId);
+    if(targetIndex == profile.currentAvatarIndex) return false;
     let avatars: string[] = [];
-    let imageIndex = Number(imageId);
-    if(isNaN(imageIndex)){
+
+    if (isNaN(targetIndex)) {
       const rgx = new RegExp(imageId.trim(), "i");
-      avatars = profile.avatars.filter(imageUrl => !rgx.test(imageUrl));
+      avatars = profile.avatars.filter(
+        (imageUrl: string) => !rgx.test(imageUrl)
+      );
+    } else if (targetIndex >= 0 && targetIndex < profile.avatars.length) {
+      avatars = profile.avatars.filter(
+        (imageUrl: string, index: number) => index != targetIndex
+      );
     } else {
-      avatars = profile.avatars.filter((imageUrl, index) => (
-        index != imageIndex
-      ));
+      return false;
     }
+
+    if (profile.currentAvatarIndex >= avatars.length) {
+      profile.currentAvatarIndex = 0;
+    } else if (profile.currentAvatarIndex > targetIndex) {
+      profile.currentAvatarIndex = (profile.currentAvatarIndex - 1);
+    }
+
     const command = new UpdateItemCommand({
       TableName: this._tableName,
       Key: {
@@ -74,6 +87,7 @@ export class TwitterRepository extends DynamoDBService {
       },
       ExpressionAttributeNames: {
         "#A": "avatars",
+        "#I": "current_avatar_index"
       },
       ExpressionAttributeValues: {
         ":a": {
@@ -81,15 +95,21 @@ export class TwitterRepository extends DynamoDBService {
             S: imageUrl,
           })),
         },
+        ":i": {
+          N: profile.currentAvatarIndex.toString()
+        }
       },
-      UpdateExpression: "SET #A = :a",
+      UpdateExpression: "SET #A = :a, #I = :i",
     });
+
     await this.update(command);
+
+    return avatars[profile.currentAvatarIndex];
   }
 
-  async pushImage(userId: string, imageUrl: string){
+  async pushImage(userId: string, imageUrl: string) {
     const profile = await this.findUser(userId);
-    if(!profile) return false;
+    if (!profile) return false;
     profile.avatars.push(imageUrl.trim());
     const command = new UpdateItemCommand({
       TableName: this._tableName,
