@@ -57,6 +57,7 @@ export class TwitterRepository extends DynamoDBService {
     if (!profile) return false;
     let targetIndex = Number(imageId);
     if(targetIndex == profile.currentAvatarIndex) return false;
+    if(profile.avatars[profile.currentAvatarIndex] == imageId) return false;
     let avatars: string[] = [];
 
     if (isNaN(targetIndex)) {
