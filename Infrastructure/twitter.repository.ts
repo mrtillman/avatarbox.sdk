@@ -56,8 +56,8 @@ export class TwitterRepository extends DynamoDBService {
     const profile = await this.findUser(userId);
     if (!profile) return false;
     let targetIndex = Number(imageId);
-    if(targetIndex == profile.currentAvatarIndex) return false;
-    if(profile.avatars[profile.currentAvatarIndex] == imageId) return false;
+    if (targetIndex == profile.currentAvatarIndex) return false;
+    if (profile.avatars[profile.currentAvatarIndex] == imageId) return false;
     let avatars: string[] = [];
 
     if (isNaN(targetIndex)) {
@@ -76,7 +76,7 @@ export class TwitterRepository extends DynamoDBService {
     if (profile.currentAvatarIndex >= avatars.length) {
       profile.currentAvatarIndex = 0;
     } else if (profile.currentAvatarIndex > targetIndex) {
-      profile.currentAvatarIndex = (profile.currentAvatarIndex - 1);
+      profile.currentAvatarIndex = profile.currentAvatarIndex - 1;
     }
 
     const command = new UpdateItemCommand({
@@ -88,7 +88,7 @@ export class TwitterRepository extends DynamoDBService {
       },
       ExpressionAttributeNames: {
         "#A": "avatars",
-        "#I": "current_avatar_index"
+        "#I": "current_avatar_index",
       },
       ExpressionAttributeValues: {
         ":a": {
@@ -97,8 +97,8 @@ export class TwitterRepository extends DynamoDBService {
           })),
         },
         ":i": {
-          N: profile.currentAvatarIndex.toString()
-        }
+          N: profile.currentAvatarIndex.toString(),
+        },
       },
       UpdateExpression: "SET #A = :a, #I = :i",
     });
