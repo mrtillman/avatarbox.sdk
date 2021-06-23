@@ -65,7 +65,8 @@
     "snyk": "^1.519.0",
     "ts-jest": "^26.5.3",
     "ts-node": "^8.6.2",
-    "yargs-parser": ">=18.1.2"
+    "yargs-parser": ">=18.1.2",
+    "normalize-url": ">=4.5.1"
   },
   "snyk": true
 }
