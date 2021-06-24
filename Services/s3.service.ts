@@ -9,6 +9,7 @@ import {
   ObjectIdentifier,
 } from "@aws-sdk/client-s3";
 import { UnixCalendar } from "../Common/calendar";
+import { createPresignedPost } from "@aws-sdk/s3-presigned-post";
 
 class S3ServiceBase {
   protected _client: S3Client;
@@ -33,6 +34,26 @@ class S3ServiceBase {
 }
 
 export namespace S3Service {
+  
+  export async function getPresignedPost(Bucket: string, Key: string){
+    const mimeType = Key.indexOf(".") > -1 ? Key.split(".").pop() : null;
+    if(!mimeType){
+      throw new Error(`Missing file extension in bucket key: ${Key}`);
+    }
+    const client = new S3Client({
+      region: process.env.REGION as string,
+    });
+    return await createPresignedPost(client,{
+      Expires: 500,
+      Bucket, Key,
+      Conditions: [["content-length-range", 1000, 1000000]], // 1KB - 1MB
+      Fields: {
+        acl: "public-read",
+        "Content-Type": `image/${mimeType}`,
+      }
+    })
+  }
+
   export class AvbxIcons extends S3ServiceBase {
     private _calendar: UnixCalendar;
 
