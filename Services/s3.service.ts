@@ -10,6 +10,7 @@ import {
 } from "@aws-sdk/client-s3";
 import { UnixCalendar } from "../Common/calendar";
 import { createPresignedPost } from "@aws-sdk/s3-presigned-post";
+import { getFileExtension } from "../Common/helpers";
 
 class S3ServiceBase {
   protected _client: S3Client;
@@ -36,7 +37,7 @@ class S3ServiceBase {
 export namespace S3Service {
   
   export async function getPresignedPost(Bucket: string, Key: string){
-    const mimeType = Key.indexOf(".") > -1 ? Key.split(".").pop() : null;
+    const mimeType = getFileExtension(Key);
     if(!mimeType){
       throw new Error(`Missing file extension in bucket key: ${Key}`);
     }
